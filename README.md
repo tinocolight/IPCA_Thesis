@@ -42,7 +42,7 @@ Um campo obrigatório por preencher aparece **a vermelho** no PDF.
 | instituição | `upca` · `ipca` | designação e capa (`ipca` = modelo oficial de 2018) |
 | versão | `provas` · `versaofinal` | a versão para defesa inclui a nota "não inclui as críticas e sugestões feitas pelo Júri" |
 | referências | `apa` · `ieee` | APA 7.ª edição (exigida); IEEE só com autorização do orientador |
-| impressão | `twoside` · `oneside` | frente e verso como o modelo oficial, ou sem páginas em branco |
+| impressão | `twoside` · `oneside` | frente e verso como o modelo oficial (verso da capa em branco, declaração no verso da folha de rosto, e cada parte do preâmbulo, capítulo, referências e anexos a começar em página ímpar, à direita), ou sem páginas em branco |
 | extra | `integridade` | acrescenta uma declaração de integridade (art. 14.º) |
 
 ## Comandos úteis
@@ -62,6 +62,8 @@ Um campo obrigatório por preencher aparece **a vermelho** no PDF.
 | `\textoapresentacao{…}` | substitui a frase "… apresentada à … para obtenção do grau …" (cursos em associação) |
 | `\reproducao{integral}` | assinala a opção na declaração (`integral`, `parcial`, `nenhuma`) |
 | `\assinatura{ficheiro}` · `\datadeclaracao{dd/mm/aaaa}` | assinatura digitalizada e data na declaração |
+| `\declaracaoassinada{ficheiro.pdf}` | substitui a declaração gerada pelo PDF impresso, assinado e digitalizado |
+| `\anexopdf{Título}{ficheiro.pdf}` | anexo que já existe em PDF (p. ex. protocolo de estágio), numerado e no índice |
 
 As listas de siglas, de figuras e de tabelas só aparecem quando há conteúdo. O LaTeX avisa
 (sem parar a compilação) se o resumo fugir às 200–300 palavras ou se houver mais de 5 palavras-chave.
@@ -72,6 +74,9 @@ As listas de siglas, de figuras e de tabelas só aparecem quando há conteúdo. 
   com os ficheiros identificados com o número de estudante (p. ex. `99999_Dissertacao.pdf`).
 - Para o depósito legal, depois da defesa, use `versaofinal` e incorpore as correções do júri.
 - Assinale a opção de reprodução na declaração e assine-a.
+- Entregam-se **à parte** (não entram no PDF do trabalho): declaração de anuência do(s)
+  orientador(es), CV, requerimento de submissão a provas públicas, termo de responsabilidade
+  (se a submissão for por decisão do estudante) e, no estágio, o dossiê de estágio.
 
 ## Estrutura
 
