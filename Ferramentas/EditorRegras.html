@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Editor de Regras UPCAThesis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Arimo:ital,wght@0,400;0,700;1,400;1,700&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: painel de regras à esquerda; pré-visualização à escala (cm reais) e ficheiro gerado à direita. */
+:root {
+  --bg: #f3f5f3;
+  --surface: #ffffff;
+  --ink: #17201a;
+  --muted: #5a6a60;
+  --line: #d6ddd8;
+  --accent: #00c83c;
+  --accent-ink: #00762b;
+  --accent-soft: #e3f7e9;
+  --paper: #ffffff;
+  --paper-ink: #111111;
+  --guide: rgba(0, 150, 55, 0.55);
+  --desk: #e4e8e5;
+  --f-ui: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --f-times: "Times New Roman", Tinos, "Liberation Serif", serif;
+  --f-arial: Arial, Arimo, "Liberation Sans", Helvetica, sans-serif;
+  --f-lucida: "Lucida Sans Unicode", "Lucida Grande", Arimo, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111613; --surface: #19201c; --ink: #e4ebe6; --muted: #98a79e;
+    --line: #2b352f; --accent-ink: #4fe07d; --accent-soft: #163322; --desk: #0c100e;
+    --guide: rgba(0, 200, 70, 0.6); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111613; --surface: #19201c; --ink: #e4ebe6; --muted: #98a79e;
+  --line: #2b352f; --accent-ink: #4fe07d; --accent-soft: #163322; --desk: #0c100e;
+  --guide: rgba(0, 200, 70, 0.6); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.5 var(--f-ui); }
+.app { max-width: 1440px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 20px; }
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+header.top h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+header.top p { margin: 0; color: var(--muted); max-width: 70ch; }
+.cols { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+
+/* Painel de regras */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.panel-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.panel-head strong { font-weight: 600; }
+details { border-bottom: 1px solid var(--line); }
+details:last-child { border-bottom: 0; }
+summary { cursor: pointer; padding: 10px 14px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; color: var(--muted); font-weight: 400; }
+details[open] summary::after { content: "−"; }
+.count { font: 500 11px var(--f-mono); color: var(--accent-ink); background: var(--accent-soft); border-radius: 99px; padding: 1px 7px; margin-left: 8px; }
+.fields { display: grid; gap: 8px; padding: 2px 14px 14px; }
+.field { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 150px); gap: 10px; align-items: center; }
+.field label { font-size: 13px; }
+.field label small { display: block; color: var(--muted); font: 11px var(--f-mono); }
+.field.changed label { color: var(--accent-ink); }
+.field.changed label::before { content: "● "; font-size: 9px; vertical-align: 2px; }
+.ctl { display: flex; gap: 4px; min-width: 0; }
+input, select, textarea, button { font: inherit; color: inherit; }
+input[type="number"], input[type="text"], select { width: 100%; min-width: 0; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-variant-numeric: tabular-nums; }
+.ctl select.unit { width: 58px; flex: none; }
+input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-ink); justify-self: end; }
+input[type="color"] { width: 34px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: none; flex: none; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 1px; }
+button { cursor: pointer; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 12px; }
+button:hover { border-color: var(--accent-ink); }
+button.primary { background: var(--accent-ink); border-color: var(--accent-ink); color: var(--surface); font-weight: 600; }
+
+/* Área da direita */
+.view { display: grid; gap: 12px; min-width: 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tab { border-radius: 99px; padding: 5px 14px; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.tabs .spacer { flex: 1; }
+.hint { color: var(--muted); font-size: 12px; }
+.desk { background: var(--desk); border-radius: 10px; padding: 18px; overflow-x: auto; }
+.spread { display: flex; gap: 14px; justify-content: center; align-items: flex-start; min-width: min-content; }
+.sheet-wrap { display: grid; gap: 6px; justify-items: center; }
+.sheet-wrap .cap { font: 11px var(--f-mono); color: var(--muted); }
+.sheet { position: relative; background: var(--paper); color: var(--paper-ink); box-shadow: 0 1px 2px rgba(0,0,0,.18), 0 6px 18px rgba(0,0,0,.10); overflow: hidden; flex: none; }
+.guide { position: absolute; border: 1px dashed var(--guide); pointer-events: none; }
+.textarea { position: absolute; overflow: hidden; }
+.sheet p { margin: 0; }
+.sheet .h { margin: 0; font-family: var(--f-arial); line-height: 1.2; }
+.sheet .num { position: absolute; font-family: var(--f-lucida); }
+.sheet .head { position: absolute; font-family: var(--f-lucida); text-align: center; }
+.figbox { background: #e6e6e6; border: 1px solid #c9c9c9; margin: 0 auto; }
+.banner { position: absolute; left: 0; top: 0; width: 100%; }
+.banner.img { background: repeating-linear-gradient(45deg, #dfe5e1 0 6px, #f2f5f3 6px 12px); display: grid; place-items: center; font: 11px var(--f-mono); color: #333; }
+.logo { position: absolute; }
+.logo.ph { border: 1px dashed #777; display: grid; place-items: center; font: 10px var(--f-mono); color: #333; text-align: center; padding: 2px; overflow: hidden; }
+.coverblock { position: absolute; font-family: var(--f-lucida); line-height: 1.25; }
+.coverblock p { margin: 0; }
+.out { display: grid; gap: 12px; }
+.out textarea { width: 100%; min-height: 420px; resize: vertical; font: 12px/1.55 var(--f-mono); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; white-space: pre; overflow: auto; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.status { font-size: 12px; color: var(--accent-ink); min-height: 1.5em; }
+.import textarea { min-height: 120px; }
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; color: var(--muted); font-size: 13px; }
+.note code, .hint code { font-family: var(--f-mono); font-size: 12px; color: var(--ink); }
+@media (prefers-reduced-motion: no-preference) { .tab, button { transition: background .15s, border-color .15s; } }
+</style>
+
+<div class="app">
+  <header class="top">
+    <h1>Editor de Regras UPCAThesis</h1>
+    <p>Ajuste as regras de formatação e copie o resultado para <code>Configuracao/Regras.tex</code>. A pré-visualização está à escala de uma folha A4, mas é aproximada: confirme sempre no PDF compilado.</p>
+  </header>
+
+  <div class="cols">
+    <aside class="panel" aria-label="Regras">
+      <div class="panel-head">
+        <strong>Regras <span class="count" id="nChanged">0 alteradas</span></strong>
+        <button id="btnReset" type="button" title="Repor os valores do modelo oficial (2018) com identidade UPCA">Repor modelo oficial</button>
+      </div>
+      <div id="groups"></div>
+    </aside>
+
+    <section class="view">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tab-paginas" aria-selected="true" data-view="paginas" type="button">Páginas</button>
+        <button class="tab" role="tab" id="tab-capa" aria-selected="false" data-view="capa" type="button">Capa e folha de rosto</button>
+        <button class="tab" role="tab" id="tab-ficheiro" aria-selected="false" data-view="ficheiro" type="button">Regras.tex</button>
+        <span class="spacer"></span>
+        <label class="hint" for="zoom">Escala</label>
+        <select id="zoom" style="width:auto">
+          <option value="dupla">Folha dupla</option>
+          <option value="uma">Uma folha, maior</option>
+        </select>
+      </div>
+
+      <div id="view-paginas" class="desk"><div class="spread" id="spreadPages"></div></div>
+      <div id="view-capa" class="desk" hidden><div class="spread" id="spreadCover"></div></div>
+      <div id="view-ficheiro" class="out" hidden>
+        <div class="row">
+          <button class="primary" id="btnCopy" type="button">Copiar Regras.tex</button>
+          <span class="status" id="copyStatus" role="status"></span>
+        </div>
+        <textarea id="output" spellcheck="false" readonly aria-label="Conteúdo de Regras.tex"></textarea>
+        <div class="import">
+          <div class="row" style="justify-content:space-between">
+            <strong>Importar regras</strong>
+            <button id="btnImport" type="button">Aplicar texto colado</button>
+          </div>
+          <p class="hint">Cole aqui um <code>Regras.tex</code> existente (ou só algumas linhas <code>chave = valor</code>) para continuar a editá-lo.</p>
+          <textarea id="importText" spellcheck="false" aria-label="Texto a importar"></textarea>
+          <span class="status" id="importStatus" role="status"></span>
+        </div>
+      </div>
+
+      <div class="note">
+        Como funciona: a classe <code>UPCAThesis.cls</code> lê <code>Configuracao/Regras.tex</code> em cada compilação. Os estudantes não precisam de mexer nesse ficheiro. Quando os Serviços Académicos publicarem um modelo novo, atualize aqui os valores e, se for o caso, troque as imagens da faixa e do logótipo em <code>Imagens/Institucional/</code>.
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const LOGO_COR = "data:image/svg+xml;base64,PHN2ZyBpZD0iQ2FtYWRhXzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDE3My41NiA3MC44NyI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiMwMGM4M2M7fS5jbHMtMntmaWxsOiNmZmY7fTwvc3R5bGU+PC9kZWZzPjxnIGlkPSJMYXllcl8xIj48cmVjdCBjbGFzcz0iY2xzLTEiIHk9IjAiIHdpZHRoPSI3MC44NyIgaGVpZ2h0PSI3MC44NyIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTI2LjQxLDExLjgxdjEwLjIyYzAsMi40MS0xLjk2LDQuMzgtNC4zOCw0LjM4cy00LjM4LTEuOTYtNC4zOC00LjM4di0xMC4yMmgtNS44NHYxMC4yMmMwLDUuNjQsNC41OSwxMC4yMiwxMC4yMiwxMC4yMnMxMC4yMi00LjU5LDEwLjIyLTEwLjIydi0xMC4yMmgtNS44NFoiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik01MS4xNiwxMS44MWgtMTIuNTV2NS44NGgxMi41NWMxLjEzLDAsMi4wNS45MiwyLjA1LDIuMDVzLS45MiwyLjA1LTIuMDUsMi4wNWgtMTIuNTV2MTAuNWg1Ljg0di00LjY1aDYuNzFjNC4zNSwwLDcuOS0zLjU0LDcuOS03LjlzLTMuNTQtNy45LTcuOS03LjlaIi8+PHBhdGggY2xhc3M9ImNscy0yIiBkPSJNMzIuMjYsNTMuMjFoLTEwLjIyYy0yLjQxLDAtNC4zOC0xLjk2LTQuMzgtNC4zOHMxLjk2LTQuMzgsNC4zOC00LjM4aDEwLjIyczAtNS44NCwwLTUuODRoLTEwLjIyYy0yLjczLDAtNS4yOSwxLjA2LTcuMjMsMy0xLjkzLDEuOTMtMyw0LjUtMyw3LjIzLDAsNS42NCw0LjU5LDEwLjIyLDEwLjIyLDEwLjIyaDEwLjIydi01Ljg0WiIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTQ4LjgzLDM4LjYxYy01LjY0LDAtMTAuMjIsNC41OS0xMC4yMiwxMC4yMnYxMC4yMmg1Ljg1di0xMC4yMmMwLTIuNDEsMS45Ni00LjM4LDQuMzgtNC4zOHM0LjM4LDEuOTYsNC4zOCw0LjM4djEwLjIyaDUuODV2LTEwLjIyYzAtNS42NC00LjU5LTEwLjIyLTEwLjIyLTEwLjIyWiIvPjxwYXRoIGQ9Ik04Ny45NiwxNi40MmMtMS45LDAtMy40MS0xLjI5LTMuNDEtMy4yNXYtNi4wOGgxLjgxdjYuMDJjMCwxLjA3LjYyLDEuNywxLjYsMS43czEuNjEtLjY0LDEuNjEtMS43di02LjAyaDEuNzl2Ni4wOGMwLDEuOTYtMS41MSwzLjI1LTMuNDEsMy4yNVoiLz48cGF0aCBkPSJNOTguODYsMTYuMzRsLTMuNjctNS42OHY1LjY4aC0xLjgxVjcuMDloMS42MWwzLjY3LDUuNjd2LTUuNjdoMS44MXY5LjI2aC0xLjYxWiIvPjxwYXRoIGQ9Ik0xMDIuNjMsMTYuMzRWNy4wOWgxLjgxdjkuMjZoLTEuODFaIi8+PHBhdGggZD0iTTEwOS45NiwxNi4zNGgtMS4zNWwtMy4wNi05LjI2aDEuODdsMS44Niw2LjAzLDEuODYtNi4wM2gxLjg5bC0zLjA3LDkuMjZaIi8+PHBhdGggZD0iTTExNC4xNSwxNi4zNFY3LjA5aDYuMXYxLjYxaC00LjI5djIuMTdoMy42NXYxLjYxaC0zLjY1djIuMjVoNC4yOXYxLjYxaC02LjFaIi8+PHBhdGggZD0iTTEyNi45MywxNi4zNGwtMS44MS0zLjY5aC0xLjN2My42OWgtMS44MVY3LjA5aDMuNjNjMS44OSwwLDMsMS4yOSwzLDIuODMsMCwxLjMtLjc5LDIuMTEtMS42OSwyLjQzbDIuMDcsMy45OWgtMi4wOVpNMTI1LjUyLDguN2gtMS43djIuNDRoMS43Yy43OSwwLDEuMzEtLjUxLDEuMzEtMS4yMnMtLjUyLTEuMjItMS4zMS0xLjIyWiIvPjxwYXRoIGQ9Ik0xMzMuMDYsMTYuNDJjLTEuNCwwLTIuNDctLjMtMy4zOC0xLjIybDEuMTctMS4xN2MuNTkuNTgsMS4zOC43OCwyLjIyLjc4LDEuMDgsMCwxLjY1LS40MiwxLjY1LTEuMTYsMC0uMzEtLjA5LS41Ny0uMjktLjc3LS4xOC0uMTctLjM2LS4yNS0uODMtLjMxbC0xLjEtLjE3Yy0uODItLjEyLTEuMzgtLjM2LTEuNzktLjc3LS40NC0uNDMtLjY2LTEuMDQtLjY2LTEuODIsMC0xLjY1LDEuMjItMi44MSwzLjIyLTIuODEsMS4yNywwLDIuMi4zMSwyLjk5LDEuMDhsLTEuMTQsMS4xM2MtLjU3LS41Ni0xLjI5LS42NC0xLjktLjY0LS45NiwwLTEuNDIuNTMtMS40MiwxLjE3LDAsLjI1LjA3LjQ4LjI2LjY2LjE4LjE3LjQ1LjMuODQuMzVsMS4xLjE3Yy44NC4xMiwxLjM2LjM0LDEuNzcuNzMuNDkuNDYuNzIsMS4xMi43MiwxLjk1LDAsMS43OS0xLjQ4LDIuODEtMy40MywyLjgxWiIvPjxwYXRoIGQ9Ik0xMzguMiwxNi4zNFY3LjA5aDEuODF2OS4yNmgtMS44MVoiLz48cGF0aCBkPSJNMTQ4LjMsMTQuOTljLS42Ni45Mi0xLjUzLDEuMzUtMi44LDEuMzVoLTMuMzRWNy4wOWgzLjM0YzEuMjYsMCwyLjEzLjQzLDIuOCwxLjM1LjU3Ljc5LjU4LDEuNzQuNTgsMy4yOHMtLjAxLDIuNDgtLjU4LDMuMjhaTTE0Ni43LDkuMjdjLS4zLS4zOC0uNzQtLjU3LTEuMzUtLjU3aC0xLjM4djYuMDNoMS4zOGMuNjEsMCwxLjA1LS4xOSwxLjM1LS41Ny4zNC0uNC4zOC0uOTkuMzgtMi40NHMtLjA0LTIuMDQtLjM4LTIuNDRaIi8+PHBhdGggZD0iTTE1NS44NiwxNi4zNGwtLjU1LTEuNjRoLTMuMjlsLS41NiwxLjY0aC0xLjg5bDMuMzctOS4yNmgxLjQybDMuMzgsOS4yNmgtMS44OVpNMTUzLjcxLDkuODJsLTEuMTcsMy4zN2gyLjNsLTEuMTMtMy4zN1oiLz48cGF0aCBkPSJNMTY1LjAzLDE0Ljk5Yy0uNjYuOTItMS41MywxLjM1LTIuOCwxLjM1aC0zLjM0VjcuMDloMy4zNGMxLjI2LDAsMi4xMy40MywyLjgsMS4zNS41Ny43OS41OCwxLjc0LjU4LDMuMjhzLS4wMSwyLjQ4LS41OCwzLjI4Wk0xNjMuNDMsOS4yN2MtLjMtLjM4LS43NC0uNTctMS4zNS0uNTdoLTEuMzh2Ni4wM2gxLjM4Yy42MSwwLDEuMDUtLjE5LDEuMzUtLjU3LjM0LS40LjM4LS45OS4zOC0yLjQ0cy0uMDQtMi4wNC0uMzgtMi40NFoiLz48cGF0aCBkPSJNMTY3LjQ2LDE2LjM0VjcuMDloNi4xdjEuNjFoLTQuMjl2Mi4xN2gzLjY1djEuNjFoLTMuNjV2Mi4yNWg0LjI5djEuNjFoLTYuMVoiLz48cGF0aCBkPSJNODguMjksMjguNjdoLTEuNzh2My40OGgtMS44MXYtOS4yNmgzLjU5YzEuOTIsMCwzLjA2LDEuMzEsMy4wNiwyLjg5cy0xLjEzLDIuODktMy4wNiwyLjg5Wk04OC4yLDI0LjUxaC0xLjY5djIuNTNoMS42OWMuODIsMCwxLjM0LS41MSwxLjM0LTEuMjZzLS41Mi0xLjI3LTEuMzQtMS4yN1oiLz48cGF0aCBkPSJNOTguNDQsMzEuMjZjLS42Mi42Mi0xLjQuOTgtMi40Ny45OHMtMS44Ni0uMzUtMi40OC0uOThjLS45Mi0uOTItLjk0LTEuOTYtLjk0LTMuNzNzLjAxLTIuODEuOTQtMy43M2MuNjItLjYyLDEuNDItLjk4LDIuNDgtLjk4czEuODUuMzUsMi40Ny45OGMuOTIuOTIuOTUsMS45Ni45NSwzLjczcy0uMDMsMi44MS0uOTUsMy43M1pNOTcuMTMsMjQuOTJjLS4yNi0uMy0uNjYtLjQ5LTEuMTYtLjQ5cy0uOS4xOS0xLjE3LjQ5Yy0uMzQuMzktLjQ0LjgzLS40NCwyLjZzLjEsMi4yLjQ0LDIuNTljLjI3LjMuNjguNTEsMS4xNy41MXMuOS0uMjEsMS4xNi0uNTFjLjM0LS4zOS40Ni0uODIuNDYtMi41OXMtLjEyLTIuMjEtLjQ2LTIuNloiLz48cGF0aCBkPSJNMTAxLjI0LDMyLjE1di05LjI2aDEuODF2Ny42NGg0LjJ2MS42MWgtNi4wMVoiLz48cGF0aCBkPSJNMTA4LjcxLDMyLjE1di05LjI2aDEuODF2OS4yNmgtMS44MVoiLz48cGF0aCBkPSJNMTE2LjIxLDI0LjUxdjcuNjRoLTEuODF2LTcuNjRoLTIuNDJ2LTEuNjFoNi42NHYxLjYxaC0yLjQyWiIvPjxwYXRoIGQ9Ik0xMjAuMSwzMi4xNXYtOS4yNmg2LjF2MS42MWgtNC4yOXYyLjE3aDMuNjV2MS42MWgtMy42NXYyLjI1aDQuMjl2MS42MWgtNi4xWk0xMjMuNDUsMjJoLTEuMTNsLjgzLTIuMjFoMS43OGwtMS40OCwyLjIxWiIvPjxwYXRoIGQ9Ik0xMzEuMDcsMzIuMjNjLTEuMDcsMC0xLjg1LS4zNS0yLjQ4LS45OC0uOTItLjkyLS45NC0xLjk2LS45NC0zLjczcy4wMS0yLjgxLjk0LTMuNzNjLjY0LS42MiwxLjQyLS45OCwyLjQ4LS45OCwxLjczLDAsMy4wNS45OSwzLjM5LDIuOTNoLTEuODVjLS4xOC0uNzUtLjY1LTEuMzEtMS41NS0xLjMxLS40OSwwLS45LjE4LTEuMTYuNDgtLjM0LjM5LS40Ni44NS0uNDYsMi42MXMuMTIsMi4yMi40NiwyLjYxYy4yNi4zLjY2LjQ4LDEuMTYuNDguOSwwLDEuMzgtLjU2LDEuNTYtMS4zMWgxLjgzYy0uMzQsMS45NC0xLjY4LDIuOTMtMy4zOSwyLjkzWiIvPjxwYXRoIGQ9Ik0xNDEuNSwzMi4xNWwtMy42Ny01LjY4djUuNjhoLTEuODF2LTkuMjZoMS42MWwzLjY3LDUuNjd2LTUuNjdoMS44MXY5LjI2aC0xLjYxWiIvPjxwYXRoIGQ9Ik0xNDUuMjcsMzIuMTV2LTkuMjZoMS44MXY5LjI2aC0xLjgxWiIvPjxwYXRoIGQ9Ik0xNTIuMzQsMzIuMjNjLTEuMDcsMC0xLjg1LS4zNS0yLjQ4LS45OC0uOTItLjkyLS45NC0xLjk2LS45NC0zLjczcy4wMS0yLjgxLjk0LTMuNzNjLjY0LS42MiwxLjQyLS45OCwyLjQ4LS45OCwxLjczLDAsMy4wNi45OSwzLjM5LDIuOTNoLTEuODVjLS4xOC0uNzUtLjY1LTEuMzEtMS41NS0xLjMxLS40OSwwLS45LjE4LTEuMTYuNDgtLjM0LjM5LS40NS44NS0uNDUsMi42MXMuMTIsMi4yMi40NSwyLjYxYy4yNi4zLjY2LjQ4LDEuMTYuNDguOSwwLDEuMzgtLjU2LDEuNTYtMS4zMWgxLjgzYy0uMzQsMS45NC0xLjY4LDIuOTMtMy4zOSwyLjkzWiIvPjxwYXRoIGQ9Ik0xNjIuNDMsMzIuMTVsLS41NS0xLjY0aC0zLjI5bC0uNTYsMS42NGgtMS44OWwzLjM3LTkuMjZoMS40MmwzLjM4LDkuMjZoLTEuODlaTTE2MC4yNywyNS42M2wtMS4xNywzLjM3aDIuM2wtMS4xMy0zLjM3WiIvPjxwYXRoIGQ9Ik05MC44NCw0Ni42MWMtLjY2LjkyLTEuNTMsMS4zNS0yLjgsMS4zNWgtMy4zNHYtOS4yNmgzLjM0YzEuMjYsMCwyLjEzLjQzLDIuOCwxLjM1LjU3Ljc5LjU4LDEuNzQuNTgsMy4yOHMtLjAxLDIuNDgtLjU4LDMuMjhaTTg5LjI0LDQwLjg5Yy0uMy0uMzgtLjc0LS41Ny0xLjM1LS41N2gtMS4zOHY2LjAzaDEuMzhjLjYxLDAsMS4wNS0uMTksMS4zNS0uNTcuMzQtLjQuMzgtLjk5LjM4LTIuNDRzLS4wNC0yLjA0LS4zOC0yLjQ0WiIvPjxwYXRoIGQ9Ik05OC44NSw0Ny4wN2MtLjYyLjYyLTEuNC45OC0yLjQ3Ljk4cy0xLjg2LS4zNS0yLjQ4LS45OGMtLjkyLS45Mi0uOTQtMS45Ni0uOTQtMy43M3MuMDEtMi44MS45NC0zLjczYy42Mi0uNjIsMS40Mi0uOTgsMi40OC0uOThzMS44NS4zNSwyLjQ3Ljk4Yy45Mi45Mi45NSwxLjk2Ljk1LDMuNzNzLS4wMywyLjgxLS45NSwzLjczWk05Ny41Myw0MC43M2MtLjI2LS4zLS42Ni0uNDktMS4xNi0uNDlzLS45LjE5LTEuMTcuNDljLS4zNC4zOS0uNDQuODMtLjQ0LDIuNnMuMSwyLjIuNDQsMi41OWMuMjcuMy42OC41MSwxLjE3LjUxcy45LS4yMSwxLjE2LS41MWMuMzQtLjM5LjQ1LS44Mi40NS0yLjU5cy0uMTItMi4yMS0uNDUtMi42WiIvPjxwYXRoIGQ9Ik0xMDcuNzYsNDguMDRjLTEuMDcsMC0xLjg1LS4zNS0yLjQ4LS45OC0uOTItLjkyLS45NC0xLjk2LS45NC0zLjczcy4wMS0yLjgxLjk0LTMuNzNjLjY0LS42MiwxLjQyLS45OCwyLjQ4LS45OCwxLjczLDAsMy4wNi45OSwzLjM5LDIuOTNoLTEuODVjLS4xOC0uNzUtLjY1LTEuMzEtMS41NS0xLjMxLS40OSwwLS45LjE4LTEuMTYuNDgtLjM0LjM5LS40NS44NC0uNDUsMi42MXMuMTIsMi4yMi40NSwyLjYxYy4yNi4zLjY2LjQ4LDEuMTYuNDguOSwwLDEuMzgtLjU2LDEuNTYtMS4zMWgxLjgzYy0uMzQsMS45NC0xLjY4LDIuOTMtMy4zOSwyLjkzWiIvPjxwYXRoIGQ9Ik0xMTcuODUsNDcuOTZsLS41NS0xLjY0aC0zLjI5bC0uNTYsMS42NGgtMS44OWwzLjM3LTkuMjZoMS40MmwzLjM4LDkuMjZoLTEuODlaTTExNS42OSw0MS40NGwtMS4xNywzLjM3aDIuM2wtMS4xMy0zLjM3Wk0xMTYuMDQsMzcuODFoLTEuMTNsLjgzLTIuMjFoMS43OGwtMS40OCwyLjIxWiIvPjxwYXRoIGQ9Ik0xMjMuNzMsNDcuOTZoLTEuMzVsLTMuMDUtOS4yNmgxLjg3bDEuODYsNi4wMywxLjg2LTYuMDNoMS44OWwtMy4wNyw5LjI2WiIvPjxwYXRoIGQ9Ik0xMzIuNjYsNDcuOTZsLS41NS0xLjY0aC0zLjI5bC0uNTYsMS42NGgtMS44OWwzLjM3LTkuMjZoMS40MmwzLjM4LDkuMjZoLTEuODlaTTEzMC41LDQxLjQ0bC0xLjE3LDMuMzdoMi4zbC0xLjEzLTMuMzdaIi8+PHBhdGggZD0iTTE0MS44Miw0Ni42MWMtLjY2LjkyLTEuNTMsMS4zNS0yLjgsMS4zNWgtMy4zNHYtOS4yNmgzLjM0YzEuMjYsMCwyLjEzLjQzLDIuOCwxLjM1LjU3Ljc5LjU4LDEuNzQuNTgsMy4yOHMtLjAxLDIuNDgtLjU4LDMuMjhaTTE0MC4yMiw0MC44OWMtLjMtLjM4LS43NC0uNTctMS4zNS0uNTdoLTEuMzh2Ni4wM2gxLjM4Yy42MSwwLDEuMDUtLjE5LDEuMzUtLjU3LjM0LS40LjM4LS45OS4zOC0yLjQ0cy0uMDQtMi4wNC0uMzgtMi40NFoiLz48cGF0aCBkPSJNMTQ5LjgzLDQ3LjA3Yy0uNjIuNjItMS40Ljk4LTIuNDcuOThzLTEuODYtLjM1LTIuNDgtLjk4Yy0uOTItLjkyLS45NC0xLjk2LS45NC0zLjczcy4wMS0yLjgxLjk0LTMuNzNjLjYyLS42MiwxLjQyLS45OCwyLjQ4LS45OHMxLjg1LjM1LDIuNDcuOThjLjkyLjkyLjk1LDEuOTYuOTUsMy43M3MtLjAzLDIuODEtLjk1LDMuNzNaTTE0OC41Miw0MC43M2MtLjI2LS4zLS42Ni0uNDktMS4xNi0uNDlzLS45LjE5LTEuMTcuNDljLS4zNC4zOS0uNDQuODMtLjQ0LDIuNnMuMSwyLjIuNDQsMi41OWMuMjcuMy42OC41MSwxLjE3LjUxcy45LS4yMSwxLjE2LS41MWMuMzQtLjM5LjQ2LS44Mi40Ni0yLjU5cy0uMTItMi4yMS0uNDYtMi42WiIvPjxwYXRoIGQ9Ik04NC43LDYzLjc3di05LjI2aDYuMXYxLjYxaC00LjI5djIuMTdoMy42NXYxLjYxaC0zLjY1djIuMjVoNC4yOXYxLjYxaC02LjFaIi8+PHBhdGggZD0iTTEwMS43Miw2Mi40MmMtLjY2LjkyLTEuNTMsMS4zNS0yLjgsMS4zNWgtMy4zNHYtOS4yNmgzLjM0YzEuMjYsMCwyLjEzLjQzLDIuOCwxLjM1LjU3Ljc5LjU4LDEuNzQuNTgsMy4yOHMtLjAxLDIuNDgtLjU4LDMuMjhaTTEwMC4xMiw1Ni43Yy0uMy0uMzgtLjc0LS41Ny0xLjM1LS41N2gtMS4zOHY2LjAzaDEuMzhjLjYxLDAsMS4wNS0uMiwxLjM1LS41Ny4zNC0uNC4zOC0uOTkuMzgtMi40NHMtLjA0LTIuMDQtLjM4LTIuNDRaIi8+PHBhdGggZD0iTTEwOS43Myw2Mi44OGMtLjYyLjYyLTEuNC45OC0yLjQ3Ljk4cy0xLjg2LS4zNS0yLjQ4LS45OGMtLjkyLS45Mi0uOTQtMS45Ni0uOTQtMy43M3MuMDEtMi44MS45NC0zLjczYy42Mi0uNjIsMS40Mi0uOTgsMi40OC0uOThzMS44NS4zNSwyLjQ3Ljk4Yy45Mi45Mi45NSwxLjk2Ljk1LDMuNzNzLS4wMywyLjgxLS45NSwzLjczWk0xMDguNDEsNTYuNTRjLS4yNi0uMy0uNjYtLjQ5LTEuMTYtLjQ5cy0uOS4xOS0xLjE3LjQ5Yy0uMzQuMzktLjQ0LjgzLS40NCwyLjZzLjEsMi4yLjQ0LDIuNTljLjI3LjMuNjguNTEsMS4xNy41MXMuOS0uMjEsMS4xNi0uNTFjLjM0LS4zOS40NS0uODIuNDUtMi41OXMtLjEyLTIuMjEtLjQ1LTIuNloiLz48cGF0aCBkPSJNMTIwLjgsNjMuNzdsLS41NS0xLjY0aC0zLjI5bC0uNTYsMS42NGgtMS44OWwzLjM3LTkuMjZoMS40MmwzLjM4LDkuMjZoLTEuODlaTTExOC42NCw1Ny4yNWwtMS4xNywzLjM3aDIuM2wtMS4xMy0zLjM3WiIvPjxwYXRoIGQ9Ik0xMjYuNjgsNjMuNzdoLTEuMzVsLTMuMDYtOS4yNmgxLjg3bDEuODYsNi4wMywxLjg2LTYuMDNoMS44OWwtMy4wNyw5LjI2WiIvPjxwYXRoIGQ9Ik0xMzAuODYsNjMuNzd2LTkuMjZoNi4xdjEuNjFoLTQuMjl2Mi4xN2gzLjY1djEuNjFoLTMuNjV2Mi4yNWg0LjI5djEuNjFoLTYuMVoiLz48L2c+PC9zdmc+";
+const LOGO_BRANCO = "data:image/svg+xml;base64,PHN2ZyBpZD0iQ2FtYWRhXzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDE3My41NiA3MC44NyI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiNmZmY7fTwvc3R5bGU+PC9kZWZzPjxnIGlkPSJMYXllcl8xIj48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0wLDB2NzAuODdoNzAuODdWMEgwWk0yMi4wMyw1OS4wNmMtNS42NCwwLTEwLjIyLTQuNTktMTAuMjItMTAuMjIsMC0yLjczLDEuMDYtNS4yOSwzLTcuMjNzNC41LTMsNy4yMy0zaDEwLjIydjUuODRoLTEwLjIyYy0yLjQxLDAtNC4zOCwxLjk2LTQuMzgsNC4zOHMxLjk2LDQuMzgsNC4zOCw0LjM4aDEwLjIydjUuODRzLTEwLjIyLDAtMTAuMjIsMFpNMzIuMjYsMjIuMDNjMCw1LjY0LTQuNTksMTAuMjItMTAuMjIsMTAuMjJzLTEwLjIyLTQuNTktMTAuMjItMTAuMjJ2LTEwLjIyaDUuODR2MTAuMjJjMCwyLjQxLDEuOTYsNC4zOCw0LjM4LDQuMzhzNC4zOC0xLjk2LDQuMzgtNC4zOHYtMTAuMjJoNS44NHYxMC4yMlpNMzguNjEsMjEuNzZoMTIuNTVjMS4xMywwLDIuMDUtLjkyLDIuMDUtMi4wNXMtLjkyLTIuMDUtMi4wNS0yLjA1aC0xMi41NXYtNS44NGgxMi41NWM0LjM1LDAsNy45LDMuNTQsNy45LDcuOXMtMy41NCw3LjktNy45LDcuOWgtNi43MXY0LjY1aC01Ljg0di0xMC41Wk01OS4wNiw1OS4wNmgtNS44NXYtMTAuMjJjMC0yLjQxLTEuOTYtNC4zOC00LjM4LTQuMzhzLTQuMzgsMS45Ni00LjM4LDQuMzh2MTAuMjJoLTUuODR2LTEwLjIyYzAtNS42NCw0LjU5LTEwLjIyLDEwLjIyLTEwLjIyczEwLjIyLDQuNTksMTAuMjIsMTAuMjJ2MTAuMjJaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNODcuOTcsMTYuNDJjLTEuOSwwLTMuNDEtMS4yOS0zLjQxLTMuMjV2LTYuMDhoMS44MXY2LjAyYzAsMS4wNy42MiwxLjcsMS42LDEuN3MxLjYxLS42NCwxLjYxLTEuN3YtNi4wMmgxLjc5djYuMDhjMCwxLjk2LTEuNTEsMy4yNS0zLjQxLDMuMjVaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNOTguODcsMTYuMzRsLTMuNjctNS42OHY1LjY4aC0xLjgxVjcuMDloMS42MWwzLjY3LDUuNjd2LTUuNjdoMS44MXY5LjI2aC0xLjYxWiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTEwMi42NCwxNi4zNFY3LjA5aDEuODF2OS4yNmgtMS44MVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMDkuOTcsMTYuMzRoLTEuMzVsLTMuMDUtOS4yNmgxLjg3bDEuODYsNi4wMywxLjg2LTYuMDNoMS44OGwtMy4wNyw5LjI2WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTExNC4xNSwxNi4zNFY3LjA5aDYuMXYxLjYxaC00LjI5djIuMTdoMy42NXYxLjYxaC0zLjY1djIuMjVoNC4yOXYxLjYxaC02LjFaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTI2LjkzLDE2LjM0bC0xLjgxLTMuNjloLTEuM3YzLjY5aC0xLjgxVjcuMDloMy42M2MxLjg4LDAsMywxLjI5LDMsMi44MywwLDEuMy0uNzksMi4xMS0xLjY5LDIuNDNsMi4wNywzLjk5aC0yLjA5Wk0xMjUuNTMsOC43aC0xLjd2Mi40NGgxLjdjLjc5LDAsMS4zMS0uNTEsMS4zMS0xLjIycy0uNTItMS4yMi0xLjMxLTEuMjJaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTMzLjA3LDE2LjQyYy0xLjQsMC0yLjQ3LS4zLTMuMzgtMS4yMmwxLjE3LTEuMTdjLjU5LjU4LDEuMzguNzgsMi4yMi43OCwxLjA4LDAsMS42NS0uNDIsMS42NS0xLjE2LDAtLjMxLS4wOS0uNTctLjI5LS43Ny0uMTgtLjE3LS4zNi0uMjUtLjgzLS4zMWwtMS4xMS0uMTdjLS44Mi0uMTItMS4zOC0uMzYtMS43OS0uNzctLjQ0LS40My0uNjYtMS4wNC0uNjYtMS44MiwwLTEuNjUsMS4yMi0yLjgxLDMuMjItMi44MSwxLjI3LDAsMi4yLjMxLDIuOTksMS4wOGwtMS4xNCwxLjEzYy0uNTctLjU2LTEuMjktLjY0LTEuOS0uNjQtLjk2LDAtMS40Mi41My0xLjQyLDEuMTcsMCwuMjUuMDcuNDguMjYuNjYuMTguMTcuNDUuMy44NC4zNWwxLjEuMTdjLjg1LjEyLDEuMzYuMzQsMS43Ny43My40OS40Ni43MSwxLjEyLjcxLDEuOTUsMCwxLjc5LTEuNDgsMi44MS0zLjQzLDIuODFaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTM4LjIsMTYuMzRWNy4wOWgxLjgxdjkuMjZoLTEuODFaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTQ4LjMsMTQuOTljLS42Ni45Mi0xLjUzLDEuMzUtMi44LDEuMzVoLTMuMzRWNy4wOWgzLjM0YzEuMjYsMCwyLjEzLjQzLDIuOCwxLjM1LjU3Ljc5LjU4LDEuNzQuNTgsMy4yOHMtLjAxLDIuNDgtLjU4LDMuMjhaTTE0Ni43LDkuMjdjLS4zLS4zOC0uNzQtLjU3LTEuMzUtLjU3aC0xLjM4djYuMDNoMS4zOGMuNjEsMCwxLjA1LS4xOSwxLjM1LS41Ny4zNC0uNC4zOC0uOTkuMzgtMi40NHMtLjA0LTIuMDQtLjM4LTIuNDRaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTU1Ljg3LDE2LjM0bC0uNTUtMS42NGgtMy4yOWwtLjU2LDEuNjRoLTEuODhsMy4zNy05LjI2aDEuNDJsMy4zOCw5LjI2aC0xLjg4Wk0xNTMuNzEsOS44MmwtMS4xNywzLjM3aDIuM2wtMS4xMy0zLjM3WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2NS4wMywxNC45OWMtLjY2LjkyLTEuNTMsMS4zNS0yLjgsMS4zNWgtMy4zNFY3LjA5aDMuMzRjMS4yNiwwLDIuMTMuNDMsMi44LDEuMzUuNTcuNzkuNTgsMS43NC41OCwzLjI4cy0uMDEsMi40OC0uNTgsMy4yOFpNMTYzLjQ0LDkuMjdjLS4zLS4zOC0uNzQtLjU3LTEuMzUtLjU3aC0xLjM4djYuMDNoMS4zOGMuNjEsMCwxLjA1LS4xOSwxLjM1LS41Ny4zNC0uNC4zOC0uOTkuMzgtMi40NHMtLjA0LTIuMDQtLjM4LTIuNDRaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTY3LjQ3LDE2LjM0VjcuMDloNi4xdjEuNjFoLTQuMjl2Mi4xN2gzLjY1djEuNjFoLTMuNjV2Mi4yNWg0LjI5djEuNjFoLTYuMVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik04OC4zLDI4LjY3aC0xLjc4djMuNDhoLTEuODF2LTkuMjZoMy41OWMxLjkyLDAsMy4wNSwxLjMxLDMuMDUsMi44OXMtMS4xMywyLjg5LTMuMDUsMi44OVpNODguMjEsMjQuNTFoLTEuNjl2Mi41M2gxLjY5Yy44MiwwLDEuMzQtLjUxLDEuMzQtMS4yNnMtLjUyLTEuMjctMS4zNC0xLjI3WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTk4LjQ1LDMxLjI2Yy0uNjIuNjItMS40Ljk4LTIuNDcuOThzLTEuODYtLjM1LTIuNDgtLjk4Yy0uOTItLjkyLS45NC0xLjk2LS45NC0zLjczcy4wMS0yLjgxLjk0LTMuNzNjLjYyLS42MiwxLjQyLS45OCwyLjQ4LS45OHMxLjg1LjM1LDIuNDcuOThjLjkyLjkyLjk1LDEuOTYuOTUsMy43M3MtLjAzLDIuODEtLjk1LDMuNzNaTTk3LjE0LDI0LjkyYy0uMjYtLjMtLjY2LS40OS0xLjE2LS40OXMtLjkuMTktMS4xNy40OWMtLjM0LjM5LS40NC44My0uNDQsMi42cy4xLDIuMi40NCwyLjU5Yy4yNy4zLjY4LjUxLDEuMTcuNTFzLjktLjIxLDEuMTYtLjUxYy4zNC0uMzkuNDYtLjgyLjQ2LTIuNTlzLS4xMi0yLjIxLS40Ni0yLjZaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTAxLjI0LDMyLjE1di05LjI2aDEuODF2Ny42NGg0LjJ2MS42MWgtNi4wMVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMDguNzIsMzIuMTV2LTkuMjZoMS44MXY5LjI2aC0xLjgxWiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTExNi4yMiwyNC41MXY3LjY0aC0xLjgxdi03LjY0aC0yLjQydi0xLjYxaDYuNjR2MS42MWgtMi40MloiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMjAuMTEsMzIuMTV2LTkuMjZoNi4xdjEuNjFoLTQuMjl2Mi4xN2gzLjY1djEuNjFoLTMuNjV2Mi4yNWg0LjI5djEuNjFoLTYuMVpNMTIzLjQ2LDIyaC0xLjEzbC44My0yLjIxaDEuNzhsLTEuNDgsMi4yMVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMzEuMDgsMzIuMjNjLTEuMDcsMC0xLjg1LS4zNS0yLjQ4LS45OC0uOTItLjkyLS45NC0xLjk2LS45NC0zLjczcy4wMS0yLjgxLjk0LTMuNzNjLjY0LS42MiwxLjQyLS45OCwyLjQ4LS45OCwxLjczLDAsMy4wNi45OSwzLjM5LDIuOTNoLTEuODVjLS4xOC0uNzUtLjY1LTEuMzEtMS41NS0xLjMxLS40OSwwLS45LjE4LTEuMTYuNDgtLjM0LjM5LS40Ni44NS0uNDYsMi42MXMuMTIsMi4yMi40NiwyLjYxYy4yNi4zLjY2LjQ4LDEuMTYuNDguOSwwLDEuMzgtLjU2LDEuNTYtMS4zMWgxLjgzYy0uMzQsMS45NC0xLjY4LDIuOTMtMy4zOSwyLjkzWiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE0MS41LDMyLjE1bC0zLjY3LTUuNjh2NS42OGgtMS44MXYtOS4yNmgxLjYxbDMuNjcsNS42N3YtNS42N2gxLjgxdjkuMjZoLTEuNjFaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTQ1LjI4LDMyLjE1di05LjI2aDEuODF2OS4yNmgtMS44MVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xNTIuMzUsMzIuMjNjLTEuMDcsMC0xLjg1LS4zNS0yLjQ4LS45OC0uOTItLjkyLS45NC0xLjk2LS45NC0zLjczcy4wMS0yLjgxLjk0LTMuNzNjLjY0LS42MiwxLjQyLS45OCwyLjQ4LS45OCwxLjczLDAsMy4wNi45OSwzLjM5LDIuOTNoLTEuODVjLS4xOC0uNzUtLjY1LTEuMzEtMS41NS0xLjMxLS40OSwwLS45LjE4LTEuMTYuNDgtLjM0LjM5LS40NS44NS0uNDUsMi42MXMuMTIsMi4yMi40NSwyLjYxYy4yNi4zLjY2LjQ4LDEuMTYuNDguOSwwLDEuMzgtLjU2LDEuNTYtMS4zMWgxLjgzYy0uMzQsMS45NC0xLjY4LDIuOTMtMy4zOSwyLjkzWiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2Mi40MywzMi4xNWwtLjU1LTEuNjRoLTMuMjlsLS41NiwxLjY0aC0xLjg5bDMuMzctOS4yNmgxLjQybDMuMzgsOS4yNmgtMS44OVpNMTYwLjI4LDI1LjYzbC0xLjE3LDMuMzdoMi4zbC0xLjEzLTMuMzdaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNOTAuODQsNDYuNjFjLS42Ni45Mi0xLjUzLDEuMzUtMi43OSwxLjM1aC0zLjM0di05LjI2aDMuMzRjMS4yNiwwLDIuMTMuNDMsMi43OSwxLjM1LjU3Ljc5LjU4LDEuNzQuNTgsMy4yOHMtLjAxLDIuNDgtLjU4LDMuMjhaTTg5LjI1LDQwLjg5Yy0uMy0uMzgtLjc0LS41Ny0xLjM1LS41N2gtMS4zOHY2LjAzaDEuMzhjLjYxLDAsMS4wNS0uMTksMS4zNS0uNTcuMzQtLjQuMzgtLjk5LjM4LTIuNDRzLS4wNC0yLjA0LS4zOC0yLjQ0WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTk4Ljg1LDQ3LjA3Yy0uNjIuNjItMS40Ljk4LTIuNDcuOThzLTEuODYtLjM1LTIuNDgtLjk4Yy0uOTItLjkyLS45NC0xLjk2LS45NC0zLjczcy4wMS0yLjgxLjk0LTMuNzNjLjYyLS42MiwxLjQyLS45OCwyLjQ4LS45OHMxLjg1LjM1LDIuNDcuOThjLjkyLjkyLjk1LDEuOTYuOTUsMy43M3MtLjAzLDIuODEtLjk1LDMuNzNaTTk3LjU0LDQwLjczYy0uMjYtLjMtLjY2LS40OS0xLjE2LS40OXMtLjkuMTktMS4xNy40OWMtLjM0LjM5LS40NC44My0uNDQsMi42cy4xLDIuMi40NCwyLjU5Yy4yNy4zLjY4LjUxLDEuMTcuNTFzLjktLjIxLDEuMTYtLjUxYy4zNC0uMzkuNDUtLjgyLjQ1LTIuNTlzLS4xMi0yLjIxLS40NS0yLjZaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTA3Ljc3LDQ4LjA0Yy0xLjA3LDAtMS44NS0uMzUtMi40OC0uOTgtLjkyLS45Mi0uOTQtMS45Ni0uOTQtMy43M3MuMDEtMi44MS45NC0zLjczYy42NC0uNjIsMS40Mi0uOTgsMi40OC0uOTgsMS43MywwLDMuMDUuOTksMy4zOSwyLjkzaC0xLjg1Yy0uMTgtLjc1LS42NS0xLjMxLTEuNTUtMS4zMS0uNDksMC0uOS4xOC0xLjE2LjQ4LS4zNC4zOS0uNDYuODQtLjQ2LDIuNjFzLjEyLDIuMjIuNDYsMi42MWMuMjYuMy42Ni40OCwxLjE2LjQ4LjksMCwxLjM4LS41NiwxLjU2LTEuMzFoMS44M2MtLjM0LDEuOTQtMS42OCwyLjkzLTMuMzksMi45M1oiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMTcuODYsNDcuOTZsLS41NS0xLjY0aC0zLjI5bC0uNTYsMS42NGgtMS44OGwzLjM3LTkuMjZoMS40MmwzLjM4LDkuMjZoLTEuODhaTTExNS43LDQxLjQ0bC0xLjE3LDMuMzdoMi4zbC0xLjEzLTMuMzdaTTExNi4wNSwzNy44MWgtMS4xM2wuODMtMi4yMWgxLjc4bC0xLjQ4LDIuMjFaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTIzLjczLDQ3Ljk2aC0xLjM1bC0zLjA1LTkuMjZoMS44N2wxLjg2LDYuMDMsMS44Ni02LjAzaDEuODlsLTMuMDcsOS4yNloiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMzIuNjYsNDcuOTZsLS41NS0xLjY0aC0zLjI5bC0uNTYsMS42NGgtMS44OWwzLjM3LTkuMjZoMS40MmwzLjM4LDkuMjZoLTEuODlaTTEzMC41MSw0MS40NGwtMS4xNywzLjM3aDIuM2wtMS4xMy0zLjM3WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE0MS44Myw0Ni42MWMtLjY2LjkyLTEuNTMsMS4zNS0yLjc5LDEuMzVoLTMuMzR2LTkuMjZoMy4zNGMxLjI2LDAsMi4xMy40MywyLjc5LDEuMzUuNTcuNzkuNTgsMS43NC41OCwzLjI4cy0uMDEsMi40OC0uNTgsMy4yOFpNMTQwLjIzLDQwLjg5Yy0uMy0uMzgtLjc0LS41Ny0xLjM1LS41N2gtMS4zOHY2LjAzaDEuMzhjLjYxLDAsMS4wNS0uMTksMS4zNS0uNTcuMzQtLjQuMzgtLjk5LjM4LTIuNDRzLS4wNC0yLjA0LS4zOC0yLjQ0WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE0OS44NCw0Ny4wN2MtLjYyLjYyLTEuNC45OC0yLjQ3Ljk4cy0xLjg2LS4zNS0yLjQ4LS45OGMtLjkyLS45Mi0uOTQtMS45Ni0uOTQtMy43M3MuMDEtMi44MS45NC0zLjczYy42Mi0uNjIsMS40Mi0uOTgsMi40OC0uOThzMS44NS4zNSwyLjQ3Ljk4Yy45Mi45Mi45NSwxLjk2Ljk1LDMuNzNzLS4wMywyLjgxLS45NSwzLjczWk0xNDguNTMsNDAuNzNjLS4yNi0uMy0uNjYtLjQ5LTEuMTYtLjQ5cy0uOS4xOS0xLjE3LjQ5Yy0uMzQuMzktLjQ0LjgzLS40NCwyLjZzLjEsMi4yLjQ0LDIuNTljLjI3LjMuNjguNTEsMS4xNy41MXMuOS0uMjEsMS4xNi0uNTFjLjM0LS4zOS40Ni0uODIuNDYtMi41OXMtLjEyLTIuMjEtLjQ2LTIuNloiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik04NC43MSw2My43N3YtOS4yNmg2LjF2MS42MWgtNC4yOXYyLjE3aDMuNjV2MS42MWgtMy42NXYyLjI1aDQuMjl2MS42MWgtNi4xWiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTEwMS43Myw2Mi40MmMtLjY2LjkyLTEuNTMsMS4zNS0yLjc5LDEuMzVoLTMuMzR2LTkuMjZoMy4zNGMxLjI2LDAsMi4xMy40MywyLjc5LDEuMzUuNTcuNzkuNTgsMS43NC41OCwzLjI4cy0uMDEsMi40OC0uNTgsMy4yOFpNMTAwLjEzLDU2LjdjLS4zLS4zOC0uNzQtLjU3LTEuMzUtLjU3aC0xLjM4djYuMDNoMS4zOGMuNjEsMCwxLjA1LS4yLDEuMzUtLjU3LjM0LS40LjM4LS45OS4zOC0yLjQ0cy0uMDQtMi4wNC0uMzgtMi40NFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMDkuNzMsNjIuODhjLS42Mi42Mi0xLjQuOTgtMi40Ny45OHMtMS44Ni0uMzUtMi40OC0uOThjLS45Mi0uOTItLjk0LTEuOTYtLjk0LTMuNzNzLjAxLTIuODEuOTQtMy43M2MuNjItLjYyLDEuNDItLjk4LDIuNDgtLjk4czEuODUuMzUsMi40Ny45OGMuOTIuOTIuOTUsMS45Ni45NSwzLjczcy0uMDMsMi44MS0uOTUsMy43M1pNMTA4LjQyLDU2LjU0Yy0uMjYtLjMtLjY2LS40OS0xLjE2LS40OXMtLjkuMTktMS4xNy40OWMtLjM0LjM5LS40NC44My0uNDQsMi42cy4xLDIuMi40NCwyLjU5Yy4yNy4zLjY4LjUxLDEuMTcuNTFzLjktLjIxLDEuMTYtLjUxYy4zNC0uMzkuNDUtLjgyLjQ1LTIuNTlzLS4xMi0yLjIxLS40NS0yLjZaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTIwLjgxLDYzLjc3bC0uNTUtMS42NGgtMy4yOWwtLjU2LDEuNjRoLTEuODhsMy4zNy05LjI2aDEuNDJsMy4zOCw5LjI2aC0xLjg4Wk0xMTguNjUsNTcuMjVsLTEuMTcsMy4zN2gyLjNsLTEuMTMtMy4zN1oiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMjYuNjksNjMuNzdoLTEuMzVsLTMuMDUtOS4yNmgxLjg3bDEuODYsNi4wMywxLjg2LTYuMDNoMS44OGwtMy4wNyw5LjI2WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTEzMC44Nyw2My43N3YtOS4yNmg2LjF2MS42MWgtNC4yOXYyLjE3aDMuNjV2MS42MWgtMy42NXYyLjI1aDQuMjl2MS42MWgtNi4xWiIvPjwvZz48L3N2Zz4=";
+
+// Definição das regras: [chave, rótulo, tipo, valor oficial, opções/comentário]
+// Tipos: dim (com unidade), pt (tamanho de letra), num, bool, enum, cor, txt
+const GRUPOS = [
+  { id: "pagina", titulo: "Página", regras: [
+    ["pagina/margem-topo", "Margem superior", "dim", "3.5cm"],
+    ["pagina/margem-baixo", "Margem inferior", "dim", "3.5cm"],
+    ["pagina/margem-interior", "Margem interior", "dim", "3cm", "lado da encadernação (esquerda nas páginas ímpares)"],
+    ["pagina/margem-exterior", "Margem exterior", "dim", "2.5cm"],
+  ]},
+  { id: "texto", titulo: "Texto", regras: [
+    ["texto/tamanho", "Tamanho da letra", "enum", "10", "10 | 11 | 12", ["10", "11", "12"]],
+    ["texto/entrelinha", "Entrelinha (como no Word)", "num", "1.5", "como no Word (1 = simples)"],
+    ["texto/indentacao", "Indentação da 1.ª linha", "dim", "0.6cm", "recuo da 1.ª linha de cada parágrafo"],
+    ["texto/indentar-primeiro", "Indentar o 1.º parágrafo após um título", "bool", "true", "recuar também o 1.º parágrafo após um título"],
+    ["texto/espaco-paragrafos", "Espaço entre parágrafos", "dim", "0pt", "espaço extra entre parágrafos"],
+    ["texto/alinhamento", "Alinhamento", "enum", "justificado", "justificado | esquerda", ["justificado", "esquerda"]],
+  ]},
+  { id: "titulos", titulo: "Títulos", regras: [
+    ["titulos/fonte", "Tipo de letra dos títulos", "enum", "sans", "sans (Arial) | serif (Times)", ["sans", "serif"]],
+    ...[1, 2, 3, 4, 5].flatMap(n => {
+      const d = { 1: ["12", "true", "false", "true", "0pt", "18pt"], 2: ["10", "true", "false", "true", "14pt", "6pt"],
+                  3: ["10", "false", "false", "true", "12pt", "6pt"], 4: ["10", "true", "false", "false", "12pt", "6pt"],
+                  5: ["10", "false", "true", "false", "10pt", "6pt"] }[n];
+      const nome = n === 1 ? "Nível 1 (capítulo)" : "Nível " + n;
+      return [
+        [`titulo${n}/tamanho`, `${nome}: tamanho`, "pt", d[0]],
+        [`titulo${n}/negrito`, `${nome}: negrito`, "bool", d[1]],
+        [`titulo${n}/italico`, `${nome}: itálico`, "bool", d[2]],
+        [`titulo${n}/maiusculas`, `${nome}: maiúsculas`, "bool", d[3]],
+        [`titulo${n}/antes`, `${nome}: espaço antes`, "dim", d[4]],
+        [`titulo${n}/depois`, `${nome}: espaço depois`, "dim", d[5]],
+      ];
+    }),
+  ]},
+  { id: "indice", titulo: "Índices", regras: [
+    ["indice/margens-laterais", "Margens laterais do índice", "dim", "4.25cm"],
+    ["indice/tamanho-capitulos", "Tamanho (capítulos)", "pt", "9"],
+    ["indice/tamanho", "Tamanho (restantes níveis)", "pt", "8"],
+    ["indice/pontos", "Pontos até ao n.º de página", "bool", "true", "pontos entre o título e o n.º de página"],
+  ]},
+  { id: "legendas", titulo: "Legendas e citações", regras: [
+    ["legendas/tamanho", "Tamanho das legendas", "pt", "8"],
+    ["legendas/negrito", "Legendas a negrito", "bool", "true"],
+    ["legendas/separador", "Separador", "enum", "endash", "endash (–) | colon (:) | period (.)", ["endash", "colon", "period"]],
+    ["citacoes/recuo", "Recuo das citações longas", "dim", "1.5cm", "citações longas: recuo de ambos os lados"],
+    ["citacoes/italico", "Citações longas em itálico", "bool", "true"],
+  ]},
+  { id: "cabrod", titulo: "Cabeçalho e rodapé", regras: [
+    ["cabecalho/conteudo", "Cabeçalho", "enum", "nenhum", "nenhum | capitulo (título do capítulo)", ["nenhum", "capitulo"]],
+    ["cabecalho/distancia", "Distância do cabeçalho ao topo", "dim", "1.25cm", "do topo da folha (como no Word)"],
+    ["cabecalho/tamanho", "Tamanho do cabeçalho", "pt", "8"],
+    ["cabecalho/negrito", "Cabeçalho a negrito", "bool", "true"],
+    ["cabecalho/linha", "Linha por baixo do cabeçalho", "bool", "false"],
+    ["rodape/numero", "Número de página", "enum", "centro", "centro | exterior | nenhum", ["centro", "exterior", "nenhum"]],
+    ["rodape/distancia", "Distância do rodapé ao fundo", "dim", "1.25cm", "do fundo da folha (como no Word)"],
+    ["rodape/tamanho", "Tamanho do n.º de página", "pt", "10"],
+  ]},
+  { id: "capa", titulo: "Capa", regras: [
+    ["capa/faixa", "Faixa no topo", "enum", "cor", "cor | imagem | nenhuma", ["cor", "imagem", "nenhuma"]],
+    ["capa/faixa-cor", "Cor da faixa", "cor", "00C83C", "cor HTML (verde UPCA)"],
+    ["capa/faixa-altura", "Altura da faixa", "dim", "6.28cm"],
+    ["capa/faixa-imagem", "Imagem da faixa", "txt", "", "imagem com a largura da folha (se faixa = imagem)"],
+    ["capa/logo", "Logótipo", "txt", "Imagens/Institucional/upca-logo-branco"],
+    ["capa/logo-altura", "Altura do logótipo", "dim", "2.2cm"],
+    ["capa/logo-esquerda", "Logótipo: distância à esquerda", "dim", "3.25cm"],
+    ["capa/logo-topo", "Logótipo: distância ao topo", "dim", "2.4cm"],
+  ]},
+  { id: "rosto", titulo: "Folha de rosto", regras: [
+    ["rosto/faixa", "Faixa no topo", "enum", "nenhuma", "", ["cor", "imagem", "nenhuma"]],
+    ["rosto/faixa-cor", "Cor da faixa", "cor", "00C83C"],
+    ["rosto/faixa-altura", "Altura da faixa", "dim", "6.28cm"],
+    ["rosto/faixa-imagem", "Imagem da faixa", "txt", ""],
+    ["rosto/logo", "Logótipo", "txt", "Imagens/Institucional/upca-logo"],
+    ["rosto/logo-altura", "Altura do logótipo", "dim", "2.2cm"],
+    ["rosto/logo-esquerda", "Logótipo: distância à esquerda", "dim", "3.25cm"],
+    ["rosto/logo-topo", "Logótipo: distância ao topo", "dim", "2.4cm"],
+  ]},
+  { id: "textocapa", titulo: "Texto da capa e da folha de rosto", regras: [
+    ["capa/texto-esquerda", "Distância à esquerda", "dim", "6.5cm", "distância à margem esquerda da folha"],
+    ["capa/texto-topo", "Distância ao topo", "dim", "11.5cm", "distância ao topo da folha"],
+    ["capa/texto-largura", "Largura do bloco", "dim", "11.25cm"],
+    ["capa/tamanho-titulo", "Tamanho do título", "pt", "14"],
+    ["capa/tamanho-nomes", "Tamanho dos nomes e data", "pt", "12"],
+    ["capa/tamanho-texto", "Tamanho do texto", "pt", "9"],
+  ]},
+  { id: "instituicao", titulo: "Instituição", regras: [
+    ["instituicao/nome", "Designação", "txt", "Universidade Politécnica do Cávado e do Ave"],
+    ["instituicao/artigo-a", "Artigo (“apresentada à …”)", "txt", "à", "\"apresentada à ...\""],
+    ["instituicao/artigo-de", "Artigo (“… da …”)", "txt", "da", "\"Código de Ética ... da ...\""],
+  ]},
+  { id: "fontes", titulo: "Fontes (XeLaTeX/LuaLaTeX)", regras: [
+    ["fontes/texto", "Texto", "txt", "Times New Roman"],
+    ["fontes/titulos", "Títulos", "txt", "Arial"],
+    ["fontes/capa", "Capa", "txt", "Lucida Sans Unicode"],
+  ]},
+];
+const DEF = {}, META = {};
+GRUPOS.forEach(g => g.regras.forEach(r => { DEF[r[0]] = r[3]; META[r[0]] = { rot: r[1], tipo: r[2], com: r[4] || "", ops: r[5], grupo: g }; }));
+let V = { ...DEF };
+try { const s = JSON.parse(localStorage.getItem("upcaRegras") || "null"); if (s) Object.keys(s).forEach(k => { if (k in DEF) V[k] = s[k]; }); } catch (e) {}
+
+// ---------- unidades
+function toCm(v) {
+  const m = String(v).trim().match(/^(-?[\d.]+)\s*(cm|mm|pt|in)?$/);
+  if (!m) return 0;
+  const n = parseFloat(m[1]), u = m[2] || "pt";
+  return u === "cm" ? n : u === "mm" ? n / 10 : u === "in" ? n * 2.54 : n * 2.54 / 72.27;
+}
+function splitDim(v) {
+  const m = String(v).trim().match(/^(-?[\d.]+)\s*(cm|mm|pt)?$/);
+  return m ? [m[1], m[2] || "pt"] : ["0", "pt"];
+}
+const isTrue = k => V[k] === "true";
+
+// ---------- painel
+const groupsEl = document.getElementById("groups");
+function buildPanel() {
+  groupsEl.innerHTML = "";
+  GRUPOS.forEach((g, gi) => {
+    const det = document.createElement("details");
+    if (gi < 3) det.open = true;
+    det.innerHTML = `<summary>${g.titulo}<span class="count" data-g="${g.id}" hidden></span></summary><div class="fields"></div>`;
+    const box = det.querySelector(".fields");
+    g.regras.forEach(([k]) => box.appendChild(fieldEl(k)));
+    groupsEl.appendChild(det);
+  });
+  refreshChanged();
+}
+function fieldEl(k) {
+  const m = META[k], id = "f-" + k.replace(/[^a-z0-9]/g, "-");
+  const wrap = document.createElement("div");
+  wrap.className = "field"; wrap.dataset.k = k;
+  const lab = `<label for="${id}">${m.rot}<small>${k}</small></label>`;
+  let ctl = "";
+  if (m.tipo === "dim") {
+    const [n, u] = splitDim(V[k]);
+    ctl = `<div class="ctl"><input type="number" step="0.05" id="${id}" value="${n}"><select class="unit" id="${id}-u" aria-label="unidade">${["cm", "mm", "pt"].map(x => `<option${x === u ? " selected" : ""}>${x}</option>`).join("")}</select></div>`;
+  } else if (m.tipo === "pt" || m.tipo === "num") {
+    ctl = `<div class="ctl"><input type="number" step="${m.tipo === "pt" ? 0.5 : 0.05}" min="0" id="${id}" value="${V[k]}"></div>`;
+  } else if (m.tipo === "bool") {
+    ctl = `<input type="checkbox" id="${id}"${isTrue(k) ? " checked" : ""}>`;
+  } else if (m.tipo === "enum") {
+    ctl = `<div class="ctl"><select id="${id}">${m.ops.map(x => `<option${x === V[k] ? " selected" : ""}>${x}</option>`).join("")}</select></div>`;
+  } else if (m.tipo === "cor") {
+    ctl = `<div class="ctl"><input type="color" id="${id}-c" value="#${V[k]}" aria-label="escolher cor"><input type="text" id="${id}" value="${V[k]}" maxlength="6"></div>`;
+  } else {
+    ctl = `<div class="ctl"><input type="text" id="${id}" value="${escapeAttr(V[k])}"></div>`;
+  }
+  wrap.innerHTML = lab + ctl;
+  const read = () => {
+    if (m.tipo === "dim") { const n = wrap.querySelector(`#${id}`).value || "0"; V[k] = n + wrap.querySelector(`#${id}-u`).value; }
+    else if (m.tipo === "bool") V[k] = wrap.querySelector(`#${id}`).checked ? "true" : "false";
+    else if (m.tipo === "cor") V[k] = wrap.querySelector(`#${id}`).value.replace("#", "").toUpperCase();
+    else V[k] = wrap.querySelector(`#${id}`).value.trim();
+    update();
+  };
+  wrap.querySelectorAll("input, select").forEach(el => el.addEventListener("input", () => {
+    if (m.tipo === "cor" && el.type === "color") wrap.querySelector(`#${id}`).value = el.value.slice(1).toUpperCase();
+    read();
+  }));
+  return wrap;
+}
+function escapeAttr(s) { return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;"); }
+function escapeHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+function refreshChanged() {
+  let tot = 0; const per = {};
+  Object.keys(DEF).forEach(k => {
+    const ch = norm(V[k]) !== norm(DEF[k]);
+    if (ch) { tot++; per[META[k].grupo.id] = (per[META[k].grupo.id] || 0) + 1; }
+    const f = groupsEl.querySelector(`.field[data-k="${CSS.escape(k)}"]`);
+    if (f) f.classList.toggle("changed", ch);
+  });
+  document.getElementById("nChanged").textContent = tot === 1 ? "1 alterada" : tot + " alteradas";
+  groupsEl.querySelectorAll(".count[data-g]").forEach(c => { const n = per[c.dataset.g] || 0; c.hidden = !n; c.textContent = n; });
+}
+function norm(v) { const s = String(v).trim(); const m = s.match(/^(-?[\d.]+)\s*(cm|mm|pt)$/); return m ? toCm(s).toFixed(4) : s.toUpperCase(); }
+
+// ---------- ficheiro Regras.tex
+const SECOES = { pagina: "Página", texto: "Texto", titulos: "Títulos (1 = capítulo ... 5)", indice: "Índices", legendas: "Legendas e citações",
+  cabrod: "Cabeçalho e rodapé", capa: "Capa", rosto: "Folha de rosto", textocapa: "Texto da capa e da folha de rosto", instituicao: "Instituição", fontes: "Fontes (só XeLaTeX/LuaLaTeX)" };
+function gerar() {
+  const L = [];
+  L.push("% =============================================================================");
+  L.push("%  REGRAS DE FORMATAÇÃO — lidas automaticamente pela classe UPCAThesis.");
+  L.push("%  Os estudantes NÃO precisam de alterar este ficheiro.");
+  L.push("%");
+  L.push("%  Gerado com Ferramentas/EditorRegras.html em " + new Date().toLocaleDateString("pt-PT") + ".");
+  L.push("%  Unidades: cm ou pt. Tamanhos de letra em pt (sem unidade). Sim/não: true/false.");
+  L.push("% =============================================================================");
+  L.push("\\regrasUPCA{");
+  GRUPOS.forEach(g => {
+    L.push("  % " + ("-".repeat(64)) + " " + SECOES[g.id]);
+    g.regras.forEach(([k]) => {
+      const val = V[k];
+      const com = META[k].com;
+      let line = "  " + (k.padEnd(25)) + " = " + val + ",";
+      if (com) line = line.padEnd(48) + " % " + com;
+      L.push(line);
+    });
+  });
+  L.push("}");
+  return L.join("\n") + "\n";
+}
+function importar(txt) {
+  let n = 0; const desc = [];
+  const sem = txt.replace(/^\s*%.*$/gm, "");
+  // várias regras na mesma linha (separadas por vírgulas)
+  sem.split(/[,\n]/).forEach(part => {
+    const mm = /^\s*([a-z0-9-]+\/[a-z0-9-]+)\s*=\s*([^%]*)/i.exec(part);
+    if (!mm) return;
+    const k = mm[1].trim(), v = mm[2].trim();
+    if (k in DEF) { V[k] = v; n++; } else desc.push(k);
+  });
+  return { n, desc };
+}
+
+// ---------- pré-visualização das páginas
+const AMOSTRA = {
+  cap: "Enquadramento do problema",
+  p: [
+    "A digitalização dos processos industriais exige sistemas capazes de recolher, tratar e apresentar dados em tempo real. Este capítulo descreve o contexto em que o trabalho se insere e os conceitos usados nos capítulos seguintes.",
+    "Os requisitos foram definidos em conjunto com a entidade parceira, a partir de entrevistas e da análise dos processos existentes. A tabela seguinte resume os indicadores escolhidos.",
+    "A arquitetura proposta separa a recolha de dados, o processamento e a visualização, o que permite substituir cada componente sem alterar os restantes.",
+    "Os testes decorreram ao longo de seis semanas, com dados reais anonimizados, e permitiram comparar o desempenho das duas abordagens.",
+  ],
+  h: ["Revisão da literatura", "Sistemas de monitorização", "Indicadores de desempenho", "Recolha de dados no chão de fábrica"],
+};
+function pt2px(pt, s) { return pt * 2.54 / 72.27 * s; }
+function headingStyle(n, s) {
+  const fam = V["titulos/fonte"] === "serif" ? "var(--f-times)" : "var(--f-arial)";
+  return `font-family:${fam};font-size:${pt2px(parseFloat(V[`titulo${n}/tamanho`]) || 10, s)}px;font-weight:${isTrue(`titulo${n}/negrito`) ? 700 : 400};font-style:${isTrue(`titulo${n}/italico`) ? "italic" : "normal"};text-transform:${isTrue(`titulo${n}/maiusculas`) ? "uppercase" : "none"};margin-top:${toCm(V[`titulo${n}/antes`]) * s}px;margin-bottom:${toCm(V[`titulo${n}/depois`]) * s}px;`;
+}
+function pagina(par, s, opts) {
+  const W = 21 * s, H = 29.7 * s;
+  const inner = toCm(V["pagina/margem-interior"]), outer = toCm(V["pagina/margem-exterior"]);
+  const left = (par ? outer : inner) * s, right = (par ? inner : outer) * s;
+  const top = toCm(V["pagina/margem-topo"]) * s, bot = toCm(V["pagina/margem-baixo"]) * s;
+  const fs = parseFloat(V["texto/tamanho"]) || 10;
+  const fpx = pt2px(fs, s);
+  const lh = (parseFloat(V["texto/entrelinha"]) || 1) * 1.15 * fpx;
+  const ind = toCm(V["texto/indentacao"]) * s;
+  const gap = toCm(V["texto/espaco-paragrafos"]) * s;
+  const al = V["texto/alinhamento"] === "esquerda" ? "left" : "justify";
+  const firstInd = isTrue("texto/indentar-primeiro") ? ind : 0;
+  const P = (t, first) => `<p style="text-indent:${first ? firstInd : ind}px;margin-bottom:${gap}px">${t}</p>`;
+  const Hd = (n, t, num) => `<p class="h" style="${headingStyle(n, s)}">${num ? `<span style="display:inline-block;min-width:${n === 1 ? 0.75 * s : 0}px;margin-right:${n === 1 ? 0 : 0.6 * fpx}px">${num}</span>` : ""}${t}</p>`;
+  const capSz = pt2px(parseFloat(V["legendas/tamanho"]) || 8, s);
+  const sep = { endash: " – ", colon: ": ", period: ". " }[V["legendas/separador"]] || " – ";
+  const qInd = toCm(V["citacoes/recuo"]) * s;
+  let body = "";
+  if (opts.capitulo) {
+    body += Hd(1, AMOSTRA.cap, "2.") + P(AMOSTRA.p[0], true) + P(AMOSTRA.p[1]) +
+      Hd(2, AMOSTRA.h[0], "2.1") + P(AMOSTRA.p[2], true) +
+      `<p style="margin:${0.3 * s}px ${qInd}px;font-style:${isTrue("citacoes/italico") ? "italic" : "normal"}">“A citação longa, com mais de 40 palavras, fica num parágrafo próprio, com recuo de ambos os lados e sem aspas, seguida da referência ao autor e ao ano.”</p>` +
+      P(AMOSTRA.p[3]) + Hd(3, AMOSTRA.h[1], "2.1.1") + P(AMOSTRA.p[1], true) + P(AMOSTRA.p[2]);
+  } else {
+    body += P(AMOSTRA.p[3]) + Hd(3, AMOSTRA.h[2], "2.2.1") + P(AMOSTRA.p[0], true) +
+      `<div style="margin:${0.4 * s}px 0"><div class="figbox" style="width:${7 * s}px;height:${4 * s}px"></div><p style="text-align:center;font-family:var(--f-arial);font-size:${capSz}px;font-weight:${isTrue("legendas/negrito") ? 700 : 400};margin-top:${0.2 * s}px">Figura 2.1${sep}Arquitetura do sistema</p><p style="text-align:center;font-family:var(--f-arial);font-size:${capSz}px">Fonte: Elaboração própria.</p></div>` +
+      Hd(4, AMOSTRA.h[3], "2.2.1.1") + P(AMOSTRA.p[1], true) + Hd(5, "Sensores e protocolos", "2.2.1.1.1") + P(AMOSTRA.p[2], true) + P(AMOSTRA.p[0]);
+  }
+  // cabeçalho e rodapé
+  let extra = "";
+  if (!opts.capitulo && V["cabecalho/conteudo"] === "capitulo") {
+    const hs = pt2px(parseFloat(V["cabecalho/tamanho"]) || 8, s);
+    const hy = toCm(V["cabecalho/distancia"]) * s;
+    extra += `<div class="head" style="left:${left}px;width:${W - left - right}px;top:${hy}px;font-size:${hs}px;font-weight:${isTrue("cabecalho/negrito") ? 700 : 400};${isTrue("cabecalho/linha") ? "border-bottom:1px solid #222;padding-bottom:2px;" : ""}">${AMOSTRA.cap.toUpperCase()}</div>`;
+  }
+  const pos = V["rodape/numero"];
+  if (pos !== "nenhum") {
+    const ns = pt2px(parseFloat(V["rodape/tamanho"]) || 10, s);
+    const ny = toCm(V["rodape/distancia"]) * s;
+    const n = opts.n;
+    let style = `bottom:${ny}px;font-size:${ns}px;`;
+    if (pos === "centro") style += `left:0;width:${W}px;text-align:center;`;
+    else style += par ? `left:${left}px;` : `right:${right}px;`;
+    extra += `<div class="num" style="${style}">${n}</div>`;
+  }
+  return `<div class="sheet-wrap"><div class="sheet" style="width:${W}px;height:${H}px">
+    <div class="guide" style="left:${left}px;top:${top}px;width:${W - left - right}px;height:${H - top - bot}px"></div>
+    <div class="textarea" style="left:${left}px;top:${top}px;width:${W - left - right}px;height:${H - top - bot}px;font-family:var(--f-times);font-size:${fpx}px;line-height:${lh}px;text-align:${al}">${body}</div>
+    ${extra}</div><span class="cap">${opts.rotulo}</span></div>`;
+}
+
+// ---------- pré-visualização da capa
+function faixa(pref, s) {
+  const tipo = V[pref + "/faixa"], h = toCm(V[pref + "/faixa-altura"]) * s;
+  if (tipo === "cor") return `<div class="banner" style="height:${h}px;background:#${/^[0-9a-f]{6}$/i.test(V[pref + "/faixa-cor"]) ? V[pref + "/faixa-cor"] : "cccccc"}"></div>`;
+  if (tipo === "imagem") return `<div class="banner img" style="height:${h}px">${escapeHtml(V[pref + "/faixa-imagem"] || "(imagem por indicar)")}</div>`;
+  return "";
+}
+function logo(pref, s) {
+  const p = V[pref + "/logo"]; if (!p) return "";
+  const h = toCm(V[pref + "/logo-altura"]) * s, x = toCm(V[pref + "/logo-esquerda"]) * s, y = toCm(V[pref + "/logo-topo"]) * s;
+  const base = p.split("/").pop().replace(/\.(pdf|png|svg|jpg)$/i, "");
+  const src = base === "upca-logo-branco" ? LOGO_BRANCO : base === "upca-logo" ? LOGO_COR : null;
+  if (src) return `<img class="logo" alt="" src="${src}" style="left:${x}px;top:${y}px;height:${h}px">`;
+  return `<div class="logo ph" style="left:${x}px;top:${y}px;height:${h}px;width:${h * 2.45}px">${escapeHtml(base)}</div>`;
+}
+function capa(pref, s, rotulo) {
+  const W = 21 * s, H = 29.7 * s;
+  const x = toCm(V["capa/texto-esquerda"]) * s, y = toCm(V["capa/texto-topo"]) * s, w = toCm(V["capa/texto-largura"]) * s;
+  const t = pt2px(parseFloat(V["capa/tamanho-titulo"]) || 14, s), n = pt2px(parseFloat(V["capa/tamanho-nomes"]) || 12, s), tx = pt2px(parseFloat(V["capa/tamanho-texto"]) || 9, s);
+  const inst = V["instituicao/nome"], art = V["instituicao/artigo-a"];
+  const bloco = `<div class="coverblock" style="left:${x}px;top:${y}px;width:${w}px">
+    <p style="font-size:${t}px;font-weight:700;text-transform:uppercase;line-height:1.28">Sistema de monitorização em tempo real</p>
+    <p style="font-size:${t}px;text-transform:uppercase;line-height:1.28">Aplicação a uma linha de produção</p>
+    <div style="height:${pt2px(60, s)}px"></div>
+    <p style="font-size:${n}px;line-height:1.5">Nome Completo do Estudante</p>
+    <p style="font-size:${tx}px;font-style:italic">Orientador</p><p style="font-size:${n}px;line-height:1.5">Prof. Doutor Nome do Orientador</p>
+    <div style="height:${pt2px(11, s)}px"></div>
+    <p style="font-size:${tx}px">Dissertação apresentada<br>${escapeHtml(art)} ${escapeHtml(inst)}</p>
+    <p style="font-size:${tx}px">para obtenção do Grau de Mestre em Engenharia Informática</p>
+    <div style="height:${pt2px(11, s)}px"></div>
+    <p style="font-size:${tx}px;font-style:italic">Este trabalho não inclui as críticas e sugestões feitas pelo Júri.</p>
+    <div style="height:${pt2px(22, s)}px"></div>
+    <p style="font-size:${n}px">outubro, 2026</p></div>`;
+  return `<div class="sheet-wrap"><div class="sheet" style="width:${W}px;height:${H}px">${faixa(pref, s)}${logo(pref, s)}${bloco}</div><span class="cap">${rotulo}</span></div>`;
+}
+
+// ---------- desenho
+function escala(desk, nPag) {
+  const largura = Math.max(desk.clientWidth - 36, 260);
+  const umaMaior = document.getElementById("zoom").value === "uma";
+  const porFolha = umaMaior ? Math.min(largura, 760) : Math.min((largura - 14) / nPag, 420);
+  return Math.max(porFolha, 240) / 21;
+}
+function update() {
+  try { localStorage.setItem("upcaRegras", JSON.stringify(V)); } catch (e) {}
+  refreshChanged();
+  const uma = document.getElementById("zoom").value === "uma";
+  const dP = document.getElementById("view-paginas");
+  if (!dP.hidden) {
+    const s = escala(dP, 2);
+    document.getElementById("spreadPages").innerHTML = uma
+      ? pagina(false, s, { capitulo: true, n: 5, rotulo: "página ímpar · início de capítulo" })
+      : pagina(true, s, { capitulo: false, n: 4, rotulo: "página par" }) + pagina(false, s, { capitulo: true, n: 5, rotulo: "página ímpar · início de capítulo" });
+  }
+  const dC = document.getElementById("view-capa");
+  if (!dC.hidden) {
+    const s = escala(dC, 2);
+    document.getElementById("spreadCover").innerHTML = uma ? capa("capa", s, "capa") : capa("capa", s, "capa") + capa("rosto", s, "folha de rosto");
+  }
+  document.getElementById("output").value = gerar();
+}
+
+// ---------- eventos
+document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x === b ? "true" : "false"));
+  ["paginas", "capa", "ficheiro"].forEach(v => document.getElementById("view-" + v).hidden = v !== b.dataset.view);
+  update();
+}));
+document.getElementById("zoom").addEventListener("change", update);
+window.addEventListener("resize", () => { clearTimeout(window.__r); window.__r = setTimeout(update, 120); });
+document.getElementById("btnReset").addEventListener("click", () => { V = { ...DEF }; buildPanel(); update(); });
+document.getElementById("btnCopy").addEventListener("click", () => {
+  const ta = document.getElementById("output"), st = document.getElementById("copyStatus");
+  const ok = () => { st.textContent = "Copiado. Cole em Configuracao/Regras.tex e compile."; };
+  const manual = () => { ta.focus(); ta.select(); st.textContent = "Texto selecionado: use Ctrl+C (ou ⌘C) para copiar."; };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(ok, manual); else manual();
+});
+document.getElementById("btnImport").addEventListener("click", () => {
+  const r = importar(document.getElementById("importText").value);
+  buildPanel(); update();
+  document.getElementById("importStatus").textContent = r.n
+    ? `${r.n} regra${r.n === 1 ? "" : "s"} aplicada${r.n === 1 ? "" : "s"}.` + (r.desc.length ? ` Ignoradas (desconhecidas): ${r.desc.join(", ")}.` : "")
+    : "Não foram encontradas linhas no formato chave = valor.";
+});
+
+buildPanel();
+update();
+</script>
+
+</body>
+</html>

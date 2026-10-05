@@ -1,0 +1,46 @@
+\chapter{Figuras, Tabelas e Código}
+
+\section{Figuras}
+
+A \autoref{fig:exemplo} mostra como inserir uma figura. Guarde as imagens na
+pasta \texttt{Imagens/}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.5\linewidth]{example-image}
+  \caption{Exemplo de figura (a legenda fica por baixo)}
+  \label{fig:exemplo}
+  \fonte{Elaboração própria.}
+\end{figure}
+
+\section{Tabelas}
+
+Nas tabelas a legenda fica por cima (\autoref{tab:exemplo}).
+
+\begin{table}[htbp]
+  \centering
+  \caption{Exemplo de tabela}
+  \label{tab:exemplo}
+  \begin{tabular}{lcc}
+    \toprule
+    Método & Precisão (\%) & Tempo (s) \\
+    \midrule
+    A & 91,2 & 1,4 \\
+    B & 94,7 & 2,9 \\
+    \bottomrule
+  \end{tabular}
+  \fonte{Adaptado de \textcite{Resnick2009}.}
+\end{table}
+
+\section{Equações e código}
+
+\begin{equation}
+  E = mc^2
+  \label{eq:exemplo}
+\end{equation}
+
+\begin{lstlisting}[language=Python, caption={Exemplo de código}, label={lst:exemplo}]
+def media(valores):
+    # Calcula a média (comentários com acentuação são suportados)
+    return sum(valores) / len(valores)
+\end{lstlisting}
