@@ -43,6 +43,7 @@
   {
     pagina/margem-topo = 3.5cm, pagina/margem-baixo = 3.5cm,
     pagina/margem-interior = 3cm, pagina/margem-exterior = 2.5cm,
+    pagina/declaracao-impar = false,
     texto/tamanho = 10, texto/entrelinha = 1.5, texto/indentacao = 0.6cm,
     texto/indentar-primeiro = true, texto/espaco-paragrafos = 0pt,
     texto/alinhamento = justificado,
@@ -604,6 +605,7 @@
   \upca@paginacapa{capa}%
   \upca@paginavazia
   \upca@paginacapa{rosto}%
+  \upca@se{pagina/declaracao-impar}{\upca@paginavazia}{}%
   % Declaração(ões) geradas, ou o PDF assinado indicado em \declaracaoassinada.
   \expandafter\ifblank\expandafter{\upca@declaracaopdf}
     {\upca@declaracao\ifupca@integridade\upca@integridade\fi}
