@@ -1,0 +1,779 @@
+#LyX file created by tex2lyx 2.4
+\lyxformat 620
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass UPCAThesis
+\begin_preamble
+% Preâmbulo LaTeX do documento LyX (Documento > Definições > Preâmbulo LaTeX).
+% Os dados do trabalho (título, autor, ...) estão no início do texto.
+\addbibresource{Bibliografia/referencias.bib}
+% Opcional: \assinatura{Imagens/assinatura.png}  \declaracaoassinada{declaracao.pdf}
+%
+%\orientadorentidade{Eng. Nome -- Empresa}  % estágio: orientador na entidade de acolhimento
+%\assinatura{Imagens/assinatura.png}     % assinatura digitalizada (opcional)
+%\declaracaoassinada{Anexos/declaracao.pdf} % substitui a declaração gerada pelo PDF impresso, assinado e digitalizado
+% Siglas e abreviaturas: \newacronym{chave}{SIGLA}{Significado por extenso}
+% No texto use \gls{chave}: na 1.ª vez aparece "Significado (SIGLA)", depois só "SIGLA".
+% Só as siglas usadas entram na Lista de Abreviaturas e Siglas (por ordem alfabética).
+\newacronym{apa}{APA}{American Psychological Association}
+\newacronym{est}{EST}{Escola Superior de Tecnologia}
+\newacronym{ipca}{IPCA}{Instituto Politécnico do Cávado e do Ave}
+\newacronym{upca}{UPCA}{Universidade Politécnica do Cávado e do Ave}
+% Pacotes adicionais
+\end_preamble
+\options dissertacao,pt,upca,provas,apa,twoside
+\use_default_options false
+\maintain_unincluded_children no
+\language portuguese
+\language_package none
+\inputencoding utf8
+\fontencoding default
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_roman_osf false
+\font_sans_osf false
+\font_typewriter_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command biber
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 0
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\use_lineno false
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 2
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\change_bars false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\docbook_table_output 0
+\docbook_mathml_prefix 1
+\end_header
+
+\begin_body
+\begin_layout Titulo
+Título do Trabalho
+\end_layout
+
+\begin_layout Subtitulo
+Subtítulo do trabalho (se não existir, deixe vazio)
+\end_layout
+
+\begin_layout TituloEN
+Title of the Work
+\end_layout
+
+\begin_layout SubtituloEN
+Subtitle of the work
+\end_layout
+
+\begin_layout Autor
+Nome Completo do Estudante
+\end_layout
+
+\begin_layout Email
+a00000@alunos.ipca.pt
+\end_layout
+
+\begin_layout Orientador
+Prof. Doutor Nome do Orientador
+\end_layout
+
+\begin_layout Coorientador
+Prof. Doutor Nome do Coorientador
+\end_layout
+
+\begin_layout Curso
+Engenharia Informática
+\end_layout
+
+\begin_layout Data
+
+\end_layout
+
+\begin_layout Palavras-chave
+palavra 1, palavra 2, palavra 3
+\end_layout
+
+\begin_layout Keywords
+keyword 1, keyword 2, keyword 3
+\end_layout
+
+\begin_layout Reproducao
+
+\end_layout
+
+
+\begin_layout Paginas iniciais
+ 
+\end_layout
+
+\begin_layout Apoios
+Nesta página faz-se alusão aos apoios financeiros recebidos (bolsas, projetos, entidades financiadoras). Se não existirem, apague este ambiente. 
+\end_layout
+
+\begin_layout Resumo
+O resumo deve ter entre 200 e 300 palavras e informar o leitor sobre a razão da investigação, como foi feita, os principais resultados e as principais conclusões. Esta secção é traduzida para inglês no Abstract.
+\end_layout
+
+\begin_layout Abstract
+The abstract should have between 200 and 300 words and is the English translation of the Resumo.
+\end_layout
+
+\begin_layout Agradecimentos
+Secção facultativa. Se não a utilizar, apague este ambiente. 
+\end_layout
+
+\begin_layout Dedicatoria
+Texto da dedicatória. 
+\end_layout
+
+\begin_layout Indices
+ 
+\end_layout
+
+\begin_layout Chapter*
+Introdução
+\end_layout
+
+\begin_layout Standard
+A introdução deve conter o enquadramento, a motivação para a escolha da problemática, os objetivos do estudo, a metodologia a seguir e a estrutura do trabalho.
+\end_layout
+
+\begin_layout Section
+Estrutura do documento
+\end_layout
+
+\begin_layout Chapter
+Exemplo de Capítulo
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset CommandInset label
+LatexCommand label
+name "cap:exemplo"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Os títulos seguem automaticamente a formatação oficial. Qualquer secção com subsecções deve ter pelo menos duas.
+\end_layout
+
+\begin_layout Section
+Citações e siglas
+\end_layout
+
+\begin_layout Standard
+As referências seguem as normas da 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+gls
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+{
+\end_layout
+
+\end_inset
+
+apa
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+parencite{APA2020}
+\end_layout
+
+\end_inset
+
+. Pode citar no texto, como 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+textcite{Deterding2011}
+\end_layout
+
+\end_inset
+
+, ou entre parênteses 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+parencite{Resnick2009}
+\end_layout
+
+\end_inset
+
+. Na segunda utilização, a sigla aparece só na forma curta (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+gls
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+{
+\end_layout
+
+\end_inset
+
+apa
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+}
+\end_layout
+
+\end_inset
+
+). Notas de rodapé: menu Inserir > Nota de rodapé.
+\begin_inset Foot
+status collapsed
+
+
+\begin_layout Standard
+Exemplo de nota.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Citacao
+Citações com mais de 40 palavras ficam em parágrafo próprio, em itálico e com recuo de ambos os lados 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+parencite[p.~171]{APA2020}
+\end_layout
+
+\end_inset
+
+. 
+\end_layout
+
+\begin_layout Section
+Níveis de título
+\end_layout
+
+\begin_layout Subsection
+Título de nível 3
+\end_layout
+
+\begin_layout Subsubsection
+Título de nível 4
+\end_layout
+
+\begin_layout Paragraph
+Título de nível 5
+\end_layout
+
+\begin_layout Paragraph
+Outro título de nível 5
+\end_layout
+
+\begin_layout Subsection
+Outro título de nível 3
+\end_layout
+
+\begin_layout Standard
+Listas: 
+\end_layout
+
+\begin_layout Itemize
+primeiro elemento; 
+\end_layout
+
+\begin_layout Itemize
+segundo elemento. 
+\end_layout
+
+\begin_layout Chapter
+Figuras, Tabelas e Código
+\end_layout
+
+\begin_layout Section
+Figuras
+\end_layout
+
+\begin_layout Standard
+A 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+autoref
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+{
+\end_layout
+
+\end_inset
+
+fig:exemplo
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+}
+\end_layout
+
+\end_inset
+
+ mostra como inserir uma figura. Guarde as imagens na pasta 
+\family typewriter
+Imagens/
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset Float figure
+placement htbp
+wide false
+sideways false
+status open
+
+
+\begin_layout Standard
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+centering
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Graphics 
+	filename example-image
+	width 50line%
+
+\end_inset
+
+ 
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Exemplo de figura (a legenda fica por baixo)
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:exemplo"
+
+\end_inset
+
+ 
+\begin_inset Flex Fonte
+status collapsed
+
+\begin_layout Standard
+Elaboração própria.
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Tabelas
+\end_layout
+
+\begin_layout Standard
+Nas tabelas a legenda fica por cima (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+autoref
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+{
+\end_layout
+
+\end_inset
+
+tab:exemplo
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+}
+\end_layout
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset Float table
+placement htbp
+wide false
+sideways false
+status open
+
+
+\begin_layout Standard
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+centering
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Exemplo de tabela
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:exemplo"
+
+\end_inset
+
+ 
+\begin_inset Tabular 
+<lyxtabular version="3" rows="3" columns="3">
+<features booktabs="true" tabularvalignment="middle" tabularwidth="0pt">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+Método 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+Precisão (%) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+Tempo (s) 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+A 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+91,2 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+1,4 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+B 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+94,7 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+2,9 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Flex Fonte
+status collapsed
+
+\begin_layout Standard
+Adaptado de 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+textcite{Resnick2009}
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Equações e código
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset Formula \begin{equation}
+  E = mc^2
+  \label{eq:exemplo}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset listings
+lstparams "language=Python,caption={Exemplo de código},label={lst:exemplo}"
+inline false
+status open
+
+\begin_layout Plain Layout
+def media(valores):
+\end_layout
+
+\begin_layout Plain Layout
+    # Calcula a média (comentários com acentuação são suportados)
+\end_layout
+
+\begin_layout Plain Layout
+    return sum(valores) / len(valores)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter*
+Conclusões
+\end_layout
+
+\begin_layout Standard
+Apresentam-se os aspetos centrais do trabalho, relacionam-se os objetivos enunciados com os resultados obtidos e referem-se os contributos, as limitações e o trabalho futuro.
+\end_layout
+
+\begin_layout Referencias
+ 
+\end_layout
+
+\begin_layout Anexos
+ 
+\end_layout
+
+\begin_layout Chapter
+Descrição do Anexo
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset CommandInset label
+LatexCommand label
+name "anx:exemplo"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Conteúdo do anexo.
+\end_layout
+
+\end_body
+\end_document

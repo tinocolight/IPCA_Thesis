@@ -78,6 +78,27 @@ As listas de siglas, de figuras e de tabelas só aparecem quando há conteúdo. 
   orientador(es), CV, requerimento de submissão a provas públicas, termo de responsabilidade
   (se a submissão for por decisão do estudante) e, no estágio, o dossiê de estágio.
 
+## Usar com o LyX
+
+Para quem prefere um editor visual, o repositório inclui `TeseLyX.lyx` (documento) e
+`UPCAThesis.layout` (layout). Usam a mesma classe e as mesmas regras do `MainThesis.tex`.
+O Overleaf ignora estes dois ficheiros, por isso o ZIP serve para ambos.
+
+1. Instale uma distribuição LaTeX (TeX Live, MiKTeX ou MacTeX) e o [LyX](https://www.lyx.org) 2.4 ou mais recente.
+2. Descompacte o repositório e abra `TeseLyX.lyx` **a partir dessa pasta** (o LyX encontra o
+   layout e a classe ao lado do documento; se avisar que a classe não está disponível, use
+   *Ferramentas → Reconfigurar* e reinicie o LyX).
+3. Preencha os campos no início do documento (Título, Autor, Orientador, Curso…). Os estilos
+   próprios do modelo estão na lista de estilos: Resumo, Abstract, Apoios, Agradecimentos,
+   Dedicatória, Citação e os marcadores de páginas geradas (capa, índices, referências, anexos).
+4. Opções da classe (tipo de trabalho, língua, …): *Documento → Definições → Classe do documento → Opções*.
+   Siglas: *Documento → Definições → Preâmbulo LaTeX* (`\newacronym{...}`).
+5. *Ver → PDF (pdflatex)*. As referências usam o biber (já configurado no documento) e o
+   ficheiro `Bibliografia/referencias.bib`.
+
+Os ficheiros `.tex` de `Preambulo/` e `Capitulos/` são do `MainThesis.tex`; no LyX o texto
+escreve-se diretamente em `TeseLyX.lyx`.
+
 ## Estrutura
 
 ```
@@ -90,6 +111,8 @@ Anexos/                 anexos ou apêndices
 Bibliografia/           referencias.bib
 Imagens/                figuras do trabalho (Institucional/ = logótipos e faixas)
 Ferramentas/            EditorRegras.html (editor das regras)
+TeseLyX.lyx             documento para o LyX (alternativa ao MainThesis.tex)
+UPCAThesis.layout       layout do LyX (não é preciso editar)
 ```
 
 ## Manutenção do modelo

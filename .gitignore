@@ -28,3 +28,9 @@
 *.bak
 build/
 MainThesis.pdf
+
+# LyX
+*.lyx~
+*.lyx.emergency
+#*.lyx#
+TeseLyX.pdf
