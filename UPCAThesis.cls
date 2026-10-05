@@ -314,6 +314,7 @@
     {€}{{\texteuro}}1}
 
 \RequirePackage[figure,table]{totalcount}
+\RequirePackage{pdfpages}
 
 %% ============================================================== Referências
 \ifupca@ieee
@@ -444,6 +445,13 @@
 \newcommand*\upca@keywords{}     \newcommand*\keywords[1]{\renewcommand*\upca@keywords{#1}}
 \newcommand*\upca@reproducao{}   \newcommand*\reproducao[1]{\renewcommand*\upca@reproducao{#1}}
 \newcommand*\upca@assinatura{}   \newcommand*\assinatura[1]{\renewcommand*\upca@assinatura{#1}}
+\newcommand*\upca@declaracaopdf{}\newcommand*\declaracaoassinada[1]{\renewcommand*\upca@declaracaopdf{#1}}
+% Título na língua do trabalho (capa, folha de rosto, declaração e PDF).
+\newcommand*\upca@tituloP{}\newcommand*\upca@subtituloP{}
+\AtBeginDocument{%
+  \ifupca@en\let\upca@tituloP\upca@tituloEN\let\upca@subtituloP\upca@subtituloEN
+  \else\let\upca@tituloP\upca@titulo\let\upca@subtituloP\upca@subtitulo\fi}
+\newcommand*\upca@tituloPnome{\ifupca@en Title of the work\else Título do trabalho\fi}
 \newcommand*\upca@datadeclaracao{\_\_\_/\_\_\_/\_\_\_\_\_\_}
 \newcommand*\datadeclaracao[1]{\renewcommand*\upca@datadeclaracao{#1}}
 \newcommand*\upca@orientadorlabel{}\newcommand*\upca@orientador{}
@@ -502,8 +510,8 @@
 \newcommand\upca@blococapa{%
   \parbox[t]{\upca@r{capa/texto-largura}}{\raggedright\upca@capafont\setstretch{1}%
     {\upca@tamcapa{titulo}{18pt}\bfseries
-     \MakeUppercase{\upca@campo\upca@titulo{Título do trabalho}}\par
-     \mdseries\upca@seexiste\upca@subtitulo{\MakeUppercase{\upca@subtitulo}\par}}%
+     \MakeUppercase{\upca@campo{\upca@tituloP}{\upca@tituloPnome}}\par
+     \mdseries\upca@seexiste{\upca@subtituloP}{\MakeUppercase{\upca@subtituloP}\par}}%
     \vspace{60pt}%
     {\upca@tamcapa{nomes}{18pt}\upca@campo\upca@autor{Nome completo do \upca@estudante}\par}%
     \upca@pessoa{\upca@orientadorlabel}{\upca@campo\upca@orientador{Nome do orientador}}%
@@ -542,8 +550,8 @@
   {\noindent
    Nome: \upca@campo\upca@autor{Nome completo do \upca@estudante}\par\noindent
    \upca@seexiste\upca@email{Endereço eletrónico: \upca@email\par\noindent}%
-   Título \upca@dotrabalho: \upca@campo\upca@titulo{Título do trabalho}\par\noindent
-   \upca@seexiste\upca@subtitulo{Subtítulo \upca@dotrabalho: \upca@subtitulo\par\noindent}%
+   Título \upca@dotrabalho: \upca@campo{\upca@tituloP}{\upca@tituloPnome}\par\noindent
+   \upca@seexiste{\upca@subtituloP}{Subtítulo \upca@dotrabalho: \upca@subtituloP\par\noindent}%
    \upca@orientadorlabel: \upca@campo\upca@orientador{Nome do orientador}\par\noindent
    \upca@seexiste\upca@coorientador{\upca@coorientadorlabel: \upca@coorientador\par\noindent}%
    \upca@seexiste\upca@entidade{\upca@entidadelabel: \upca@entidade\par\noindent}%
@@ -596,8 +604,10 @@
   \upca@paginacapa{capa}%
   \upca@paginavazia
   \upca@paginacapa{rosto}%
-  \upca@declaracao
-  \ifupca@integridade\upca@integridade\fi
+  % Declaração(ões) geradas, ou o PDF assinado indicado em \declaracaoassinada.
+  \expandafter\ifblank\expandafter{\upca@declaracaopdf}
+    {\upca@declaracao\ifupca@integridade\upca@integridade\fi}
+    {\clearpage\includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{\upca@declaracaopdf}}
   \upca@duplavazia
   \pagenumbering{Roman}}
 
@@ -669,6 +679,15 @@
   \renewcommand*\theHchapter{#3.\Alph{chapter}}%
   \renewcommand*\upca@chaplabel{\MakeUppercase{#1}~\thechapter\ -- }%
   \def\chapterautorefname{#1}}
+% \anexopdf[páginas]{Título}{ficheiro.pdf}: anexo que já existe em PDF (p. ex.
+% protocolo de estágio). Entra no índice como "ANEXO B – Título" e as páginas
+% são reduzidas para deixar visível o número de página.
+\NewDocumentCommand\anexopdf{O{-} m m}{%
+  \upca@novapagina
+  \setcounter{secnumdepth}{4}%
+  \refstepcounter{chapter}%
+  \includepdf[pages={#1},scale=0.88,pagecommand={\thispagestyle{plain}},
+    addtotoc={1,chapter,0,{\protect\numberline{\thechapter}#2},upca:anexopdf:\theHchapter}]{#3}}
 \newcommand\anexos{\upca@iniciaranexos{\upca@anexoname}{\upca@anexosname}{anexo}}
 \newcommand\apendices{\upca@iniciaranexos{\upca@apendicename}{\upca@apendicesname}{apendice}}
 
@@ -708,7 +727,7 @@
 \ExplSyntaxOff
 
 \AtBeginDocument{%
-  \hypersetup{pdftitle={\upca@titulo},pdfauthor={\upca@autor},
+  \hypersetup{pdftitle={\upca@tituloP},pdfauthor={\upca@autor},
     pdfsubject={\upca@designacao},pdfkeywords={\upca@palavraschave}}}
 
 \endinput

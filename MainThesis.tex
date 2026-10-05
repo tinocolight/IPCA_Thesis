@@ -19,9 +19,9 @@
 ]{UPCAThesis}
 
 % ------------------------------------------------------------------- Dados
-\titulo{Título do Trabalho}
+\titulo{Título do Trabalho}            % em português (com a opção en, a capa usa o \tituloEN)
 \subtitulo{Subtítulo do trabalho (se não existir, deixe vazio)}
-\tituloEN{Title of the Work}
+\tituloEN{Title of the Work}            % em inglês (página do Abstract)
 \subtituloEN{Subtitle of the work}
 \autor{Nome Completo do Estudante}
 \email{a00000@alunos.ipca.pt}            % opcional
@@ -34,6 +34,7 @@
 \keywords{keyword 1, keyword 2, keyword 3}       % até 5
 \reproducao{}           % integral | parcial | nenhuma — assinala a opção na declaração
 %\assinatura{Imagens/assinatura.png}     % assinatura digitalizada (opcional)
+%\declaracaoassinada{Anexos/declaracao.pdf} % substitui a declaração gerada pelo PDF impresso, assinado e digitalizado
 
 \addbibresource{Bibliografia/referencias.bib}
 \input{Preambulo/Siglas}                 % definição das siglas
@@ -46,8 +47,8 @@
 \paginasiniciais                         % capa, folha de rosto e declaração
 
 \input{Preambulo/Apoios}                 % opcional: comente (%) para remover
-\input{Preambulo/Resumo}
-\input{Preambulo/Abstract}
+\input{Preambulo/Resumo}                 % trabalho em inglês: pode trocar a ordem
+\input{Preambulo/Abstract}               % das duas linhas (Abstract primeiro)
 \input{Preambulo/Agradecimentos}         % opcional
 \input{Preambulo/Dedicatoria}            % opcional
 
@@ -62,5 +63,6 @@
 
 \anexos                                  % opcional (ou \apendices)
 \input{Anexos/AnexoA}
+%\anexopdf{Protocolo de estágio}{Anexos/protocolo.pdf}  % anexo que já existe em PDF
 
 \end{document}
