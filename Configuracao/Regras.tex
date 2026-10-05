@@ -1,0 +1,91 @@
+% =============================================================================
+%  REGRAS DE FORMATAÇÃO — lidas automaticamente pela classe UPCAThesis.
+%  Os estudantes NÃO precisam de alterar este ficheiro.
+%
+%  Valores atuais: modelo Word oficial publicado pelos Serviços Académicos (2018),
+%  com a designação e o logótipo da UPCA (faixa da capa provisória).
+%  Quando sair um modelo novo, basta atualizar estes valores (à mão ou com
+%  Ferramentas/EditorRegras.html, que gera este ficheiro) e as imagens da capa.
+%
+%  Unidades: cm ou pt. Tamanhos de letra em pt (sem unidade). Sim/não: true/false.
+% =============================================================================
+\regrasUPCA{
+  % ---------------------------------------------------------------- Página
+  pagina/margem-topo        = 3.5cm,
+  pagina/margem-baixo       = 3.5cm,
+  pagina/margem-interior    = 3cm,      % lado da encadernação (esquerda nas páginas ímpares)
+  pagina/margem-exterior    = 2.5cm,
+  pagina/declaracao-impar   = false,    % true = declaração em página ímpar (e não no verso da folha de rosto)
+  % ---------------------------------------------------------------- Texto
+  texto/tamanho             = 10,       % 10, 11 ou 12
+  texto/entrelinha          = 1.5,      % como no Word (1 = simples)
+  texto/indentacao          = 0.6cm,    % recuo da 1.ª linha de cada parágrafo
+  texto/indentar-primeiro   = true,     % recuar também o 1.º parágrafo após um título
+  texto/espaco-paragrafos   = 0pt,      % espaço extra entre parágrafos
+  texto/alinhamento         = justificado, % justificado | esquerda
+  % ---------------------------------------------------------------- Títulos (1 = capítulo ... 5)
+  titulos/fonte             = sans,     % sans (Arial) | serif (Times)
+  titulo1/tamanho = 12,  titulo1/negrito = true,  titulo1/italico = false,
+  titulo1/maiusculas = true,  titulo1/antes = 0pt,  titulo1/depois = 18pt,
+  titulo2/tamanho = 10,  titulo2/negrito = true,  titulo2/italico = false,
+  titulo2/maiusculas = true,  titulo2/antes = 14pt, titulo2/depois = 6pt,
+  titulo3/tamanho = 10,  titulo3/negrito = false, titulo3/italico = false,
+  titulo3/maiusculas = true,  titulo3/antes = 12pt, titulo3/depois = 6pt,
+  titulo4/tamanho = 10,  titulo4/negrito = true,  titulo4/italico = false,
+  titulo4/maiusculas = false, titulo4/antes = 12pt, titulo4/depois = 6pt,
+  titulo5/tamanho = 10,  titulo5/negrito = false, titulo5/italico = true,
+  titulo5/maiusculas = false, titulo5/antes = 10pt, titulo5/depois = 6pt,
+  % ---------------------------------------------------------------- Índices
+  indice/margens-laterais   = 4.25cm,
+  indice/tamanho-capitulos  = 9,
+  indice/tamanho            = 8,
+  indice/pontos             = true,     % pontos entre o título e o n.º de página
+  % ---------------------------------------------------------------- Legendas e citações
+  legendas/tamanho          = 8,
+  legendas/negrito          = true,
+  legendas/separador        = endash,   % endash (–) | colon (:) | period (.)
+  citacoes/recuo            = 1.5cm,    % citações longas: recuo de ambos os lados
+  citacoes/italico          = true,
+  % ---------------------------------------------------------------- Cabeçalho e rodapé
+  cabecalho/conteudo        = nenhum,   % nenhum | capitulo (título do capítulo)
+  cabecalho/distancia       = 1.25cm,   % do topo da folha (como no Word)
+  cabecalho/tamanho         = 8,
+  cabecalho/negrito         = true,
+  cabecalho/linha           = false,
+  rodape/numero             = centro,   % centro | exterior | nenhum
+  rodape/distancia          = 1.25cm,   % do fundo da folha (como no Word)
+  rodape/tamanho            = 10,
+  % ---------------------------------------------------------------- Capa
+  capa/faixa                = cor,      % cor | imagem | nenhuma
+  capa/faixa-cor            = 00C83C,   % cor HTML (verde UPCA)
+  capa/faixa-altura         = 6.28cm,
+  capa/faixa-imagem         = ,         % imagem com a largura da folha (se faixa = imagem)
+  capa/logo                 = Imagens/Institucional/upca-logo-branco,
+  capa/logo-altura          = 2.2cm,
+  capa/logo-esquerda        = 3.25cm,
+  capa/logo-topo            = 2.4cm,
+  % ---------------------------------------------------------------- Folha de rosto
+  rosto/faixa               = nenhuma,
+  rosto/faixa-cor           = 00C83C,
+  rosto/faixa-altura        = 6.28cm,
+  rosto/faixa-imagem        = ,
+  rosto/logo                = Imagens/Institucional/upca-logo,
+  rosto/logo-altura         = 2.2cm,
+  rosto/logo-esquerda       = 3.25cm,
+  rosto/logo-topo           = 2.4cm,
+  % ---------------------------------------------------------------- Texto da capa e da folha de rosto
+  capa/texto-esquerda       = 6.5cm,    % distância à margem esquerda da folha
+  capa/texto-topo           = 11.5cm,   % distância ao topo da folha
+  capa/texto-largura        = 11.25cm,
+  capa/tamanho-titulo       = 14,
+  capa/tamanho-nomes        = 12,
+  capa/tamanho-texto        = 9,
+  % ---------------------------------------------------------------- Instituição
+  instituicao/nome          = Universidade Politécnica do Cávado e do Ave,
+  instituicao/artigo-a      = à,        % "apresentada à ..."
+  instituicao/artigo-de     = da,       % "Código de Ética ... da ..."
+  % ---------------------------------------------------------------- Fontes (só XeLaTeX/LuaLaTeX)
+  fontes/texto              = Times New Roman,
+  fontes/titulos            = Arial,
+  fontes/capa               = Lucida Sans Unicode,
+}

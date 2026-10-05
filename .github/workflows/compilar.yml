@@ -1,0 +1,36 @@
+# Compila o modelo em várias variantes a cada alteração e guarda os PDF
+# (separador "Actions" do GitHub > execução > "Artifacts").
+name: Compilar modelo
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pdf:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        variante:
+          - { nome: dissertacao-upca, opcoes: "" }
+          - { nome: dissertacao-ipca-2018, opcoes: "ipca" }
+          - { nome: tese-en-integridade, opcoes: "tese,en,integridade" }
+          - { nome: estagio-oneside-final-ieee, opcoes: "estagio,oneside,versaofinal,ieee" }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Aplicar as opções da variante
+        if: matrix.variante.opcoes != ''
+        env:
+          OPCOES: ${{ matrix.variante.opcoes }}
+        run: |
+          { printf '\\PassOptionsToClass{%s}{UPCAThesis}\n' "$OPCOES"; cat MainThesis.tex; } > tmp.tex
+          mv tmp.tex MainThesis.tex
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: MainThesis.tex
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.variante.nome }}
+          path: MainThesis.pdf

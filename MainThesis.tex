@@ -1,70 +1,68 @@
-\documentclass[10pt, twoside, a4paper]{report}
+% =============================================================================
+%  Modelo LaTeX — Dissertação, Projeto, Relatório de Estágio ou Tese
+%  Universidade Politécnica do Cávado e do Ave (UPCA), antigo IPCA
+%
+%  1. Escolha as opções e preencha os dados abaixo.
+%  2. Escreva o texto nos ficheiros de Preambulo/, Capitulos/ e Anexos/.
+%  3. Acrescente as referências em Bibliografia/referencias.bib.
+%  Capa, folha de rosto, declaração, índices e listas são gerados automaticamente.
+%  Instruções completas: README.md
+% =============================================================================
+\documentclass[
+  dissertacao,  % dissertacao | projeto | estagio | tese
+  pt,           % pt | en  (língua do trabalho; inglês requer anuência do orientador)
+  upca,         % upca | ipca  (ipca = designação e capa do modelo oficial de 2018)
+  provas,       % provas (entrega para defesa) | versaofinal (após a defesa)
+  apa,          % apa (norma exigida) | ieee (só com autorização do orientador)
+  twoside,      % twoside (frente e verso, como o modelo oficial) | oneside
+  %integridade, % acrescenta uma declaração de integridade (art. 14.º do regulamento)
+]{UPCAThesis}
 
-% Add used configurations
-\input{Configurations/Configurations}
+% ------------------------------------------------------------------- Dados
+\titulo{Título do Trabalho}            % em português (com a opção en, a capa usa o \tituloEN)
+\subtitulo{Subtítulo do trabalho (se não existir, deixe vazio)}
+\tituloEN{Title of the Work}            % em inglês (página do Abstract)
+\subtituloEN{Subtitle of the work}
+\autor{Nome Completo do Estudante}
+\email{a00000@alunos.ipca.pt}            % opcional
+\orientador{Prof. Doutor Nome do Orientador}   % \orientador[Orientadora]{...} no feminino
+\coorientador{Prof. Doutor Nome do Coorientador}  % opcional
+%\orientadorentidade{Eng. Nome -- Empresa}  % estágio: orientador na entidade de acolhimento
+\curso{Engenharia Informática}           % "... Grau de Mestre em <curso>"
+\data{}                                  % vazio = mês e ano atuais (p. ex. "outubro, 2026")
+\palavraschave{palavra 1, palavra 2, palavra 3}  % até 5
+\keywords{keyword 1, keyword 2, keyword 3}       % até 5
+\reproducao{}           % integral | parcial | nenhuma — assinala a opção na declaração
+%\assinatura{Imagens/assinatura.png}     % assinatura digitalizada (opcional)
+%\declaracaoassinada{Anexos/declaracao.pdf} % substitui a declaração gerada pelo PDF impresso, assinado e digitalizado
+
+\addbibresource{Bibliografia/referencias.bib}
+\input{Preambulo/Siglas}                 % definição das siglas
+
+% Pacotes adicionais
+\usepackage{lipsum}\setlipsum{auto-lang=false} % só para o texto de exemplo; pode remover
 
 \begin{document}
-% #####################  COVER  ###########################
-\pagenumbering{gobble} 								% Disable Page Numbering
 
-\input{FrontCover/FrontCover} \cleardoublepage
+\paginasiniciais                         % capa, folha de rosto e declaração
 
-\input{FrontCover/FrontCoverInner} 
+\input{Preambulo/Apoios}                 % opcional: comente (%) para remover
+\input{Preambulo/Resumo}                 % trabalho em inglês: pode trocar a ordem
+\input{Preambulo/Abstract}               % das duas linhas (Abstract primeiro)
+\input{Preambulo/Agradecimentos}         % opcional
+\input{Preambulo/Dedicatoria}            % opcional
 
-\setcounter{secnumdepth}{-1}						% Disable section numbering in table of contents
+\indices                                 % siglas, índice, figuras e tabelas
 
-\onehalfspacing										% Sets the line spacing in the document to 1.5
+\input{Capitulos/Introducao}
+\input{Capitulos/Capitulo1}
+\input{Capitulos/Capitulo2}
+\input{Capitulos/Conclusoes}
 
-%\includepdf[page={1}]{FrontCover/Declaration.pdf} \cleardoublepage
- \input{FrontCover/Declaration} \cleardoublepage	% Edit the date, sign, create a PDF and replace it by the one on the previous line. Uncomment the previous line and comment this one
+\referencias                             % referências bibliográficas
 
-% #####################   Introductory Information     ###########################
+\anexos                                  % opcional (ou \apendices)
+\input{Anexos/AnexoA}
+%\anexopdf{Protocolo de estágio}{Anexos/protocolo.pdf}  % anexo que já existe em PDF
 
-{
-\pagenumbering{Roman}  								% Enable Roman Page Numbering
-%\titleformat{\section}{\normalfont\Large\bfseries}{}{0pt}{}
-
-
-\input{FrontCover/FundingAndGrants}					% To remove it no grant was available
-\cleardoublepage
-
-\input{FrontCover/AbstractInPortuguese} \cleardoublepage
-
-\input{FrontCover/AbstractInEnglish} \cleardoublepage
-
-\input{FrontCover/Acknowledgments} \cleardoublepage
-
-\input{FrontCover/Dedication} \cleardoublepage
-
-\input{FrontCover/ListOfabbreviationsOrAcronyms} \cleardoublepage
-
-\setcounter{tocdepth}{5}
-\input{FrontCover/Index} \cleardoublepage
-}
-% ###############################################################
-\pagenumbering{arabic}  							% Enable Regular Page Numbering
-\restoregeometry
-
-\input{Chapters/Introduction} \cleardoublepage
-
-\setcounter{secnumdepth}{5}							% Enable section numbering up to SubSubSection (level 5)
-
-% #################### Start of the Chapters ######################
-
-\input{Chapters/Chapter_01} \cleardoublepage
-
-\input{Chapters/Chapter_02} \cleardoublepage
-
-
-% #################### End Chapter and Bibliography ######################
-\setcounter{secnumdepth}{-1}
-\input{Chapters/Conclusions} \cleardoublepage
-
-\input{Chapters/Bibliography} \cleardoublepage
-
-% #################### Attachments ######################
-\pagenumbering{gobble} 
-\input{Chapters/Attachments} \cleardoublepage
-	
-	
 \end{document}
