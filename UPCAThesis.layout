@@ -1,0 +1,238 @@
+#% Do not delete the line below; configure depends on this
+#  \DeclareLaTeXClass[UPCAThesis]{Modelo UPCA/IPCA (UPCAThesis)}
+#  \DeclareCategory{Theses}
+# Layout LyX para a classe UPCAThesis.cls (mesma pasta). Só é usado pelo LyX;
+# o Overleaf e o LaTeX ignoram este ficheiro.
+Format 104
+
+Input report.layout
+
+Provides amsmath 1
+Provides hyperref 1
+Provides graphicx 1
+Provides xcolor 1
+Provides float 1
+Provides babel 1
+
+# ------------------------------------------------------------ Dados (preâmbulo)
+Style Titulo
+	CopyStyle             Title
+	LatexType             Command
+	LatexName             titulo
+	InPreamble            1
+	InTitle               0
+	KeepEmpty             1
+	LabelType             Static
+	LabelString           "Título:"
+	Align                 Left
+	Font
+	  Size                Large
+	  Series              Bold
+	EndFont
+	LabelFont
+	  Size                Small
+	  Series              Medium
+	  Color               blue
+	EndFont
+	Margin                Static
+	LeftMargin            "Coorientador:xx"
+End
+
+Style Subtitulo
+	CopyStyle             Titulo
+	LatexName             subtitulo
+	LabelString           "Subtítulo:"
+	Font
+	  Size                Large
+	  Series              Medium
+	EndFont
+End
+
+Style TituloEN
+	CopyStyle             Titulo
+	LatexName             tituloEN
+	LabelString           "Título (EN):"
+End
+
+Style SubtituloEN
+	CopyStyle             Subtitulo
+	LatexName             subtituloEN
+	LabelString           "Subtítulo (EN):"
+End
+
+Style Autor
+	CopyStyle             Titulo
+	LatexName             autor
+	LabelString           "Autor:"
+	Font
+	  Size                Normal
+	  Series              Medium
+	EndFont
+End
+
+Style Email
+	CopyStyle             Autor
+	LatexName             email
+	LabelString           "Email:"
+End
+
+Style Orientador
+	CopyStyle             Autor
+	LatexName             orientador
+	LabelString           "Orientador:"
+End
+
+Style Coorientador
+	CopyStyle             Autor
+	LatexName             coorientador
+	LabelString           "Coorientador:"
+End
+
+Style Orientador_entidade
+	CopyStyle             Autor
+	LatexName             orientadorentidade
+	LabelString           "Orient. entidade:"
+End
+
+Style Curso
+	CopyStyle             Autor
+	LatexName             curso
+	LabelString           "Curso:"
+End
+
+Style Data
+	CopyStyle             Autor
+	LatexName             data
+	LabelString           "Data:"
+End
+
+Style Palavras-chave
+	CopyStyle             Autor
+	LatexName             palavraschave
+	LabelString           "Palavras-chave:"
+End
+
+Style Keywords
+	CopyStyle             Autor
+	LatexName             keywords
+	LabelString           "Keywords:"
+End
+
+Style Reproducao
+	CopyStyle             Autor
+	LatexName             reproducao
+	LabelString           "Reprodução:"
+End
+
+# ------------------------------------------------------------ Páginas geradas
+# Parágrafos vazios que geram o comando correspondente.
+Style Paginas_iniciais
+	Category              Estrutura
+	LatexType             Command
+	LatexName             paginasiniciais
+	KeepEmpty             1
+	ParbreakIsNewline     1
+	LabelType             Static
+	LabelString           "[Capa, folha de rosto e declaração]"
+	LabelFont
+	  Color               blue
+	  Series              Bold
+	EndFont
+	Preamble
+	EndPreamble
+End
+
+Style Indices
+	CopyStyle             Paginas_iniciais
+	LatexName             indices
+	LabelString           "[Siglas, índice, figuras e tabelas]"
+End
+
+Style Referencias
+	CopyStyle             Paginas_iniciais
+	LatexName             referencias
+	LabelString           "[Referências bibliográficas]"
+End
+
+Style Anexos
+	CopyStyle             Paginas_iniciais
+	LatexName             anexos
+	LabelString           "[Início dos anexos]"
+End
+
+Style Apendices
+	CopyStyle             Paginas_iniciais
+	LatexName             apendices
+	LabelString           "[Início dos apêndices]"
+End
+
+# ------------------------------------------------------------ Preâmbulo do trabalho
+Style Resumo
+	Category              Preâmbulo
+	LatexType             Environment
+	LatexName             resumo
+	Margin                Static
+	LeftMargin            MM
+	RightMargin           MM
+	ParIndent             MM
+	LabelType             Centered
+	LabelString           "Resumo"
+	LabelBottomSep        0.5
+	LabelFont
+	  Series              Bold
+	EndFont
+	Font
+	  Size                Small
+	EndFont
+End
+
+Style Abstract
+	CopyStyle             Resumo
+	LatexName             abstract
+	LabelString           "Abstract"
+End
+
+Style Apoios
+	CopyStyle             Resumo
+	LatexName             apoios
+	LabelString           "Apoios"
+End
+
+Style Agradecimentos
+	CopyStyle             Resumo
+	LatexName             agradecimentos
+	LabelString           "Agradecimentos"
+End
+
+Style Dedicatoria
+	CopyStyle             Resumo
+	LatexName             dedicatoria
+	LabelString           "Dedicatória"
+	Align                 Right
+	Font
+	  Shape               Italic
+	EndFont
+End
+
+Style Citacao
+	CopyStyle             Quotation
+	LatexName             citacao
+End
+
+# Capítulo sem número (Introdução, Conclusões)
+Style Capitulo_sem_numero
+	CopyStyle             Chapter*
+	LatexName             chapter*
+End
+
+# Linha "Fonte:" de figuras e tabelas
+InsetLayout Flex:Fonte
+	LyXType               custom
+	LatexType             command
+	LatexName             fonte
+	Decoration            classic
+	LabelString           Fonte
+	Font
+	  Size                Small
+	EndFont
+End
